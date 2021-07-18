@@ -10,23 +10,25 @@ def convert_path(url_rule: str) -> str:
     convert "/api/items/<int:id>/" to "/api/items/{id}/"
     """
     subs = []
-    for sub in str(url_rule).split('/'):
-        if '<' in sub:
-            if ':' in sub:
-                start = sub.index(':') + 1
+    for sub in str(url_rule).split("/"):
+        if "<" in sub:
+            if ":" in sub:
+                start = sub.index(":") + 1
             else:
                 start = 1
-            subs.append('{{{:s}}}'.format(sub[start:-1]))
+            subs.append("{{{:s}}}".format(sub[start:-1]))
         else:
             subs.append(sub)
-    return '/'.join(subs)
+    return "/".join(subs)
 
 
 def get_path_param_names(path: str) -> t.Set[str]:
     return set(re.findall("{(.*?)}", path))
 
 
-def get_typed_annotation(param: inspect.Parameter, globalns: t.Dict[str, t.Any]) -> t.Any:
+def get_typed_annotation(
+    param: inspect.Parameter, globalns: t.Dict[str, t.Any]
+) -> t.Any:
     annotation = param.annotation
     if isinstance(annotation, str):
         annotation = ForwardRef(annotation)
