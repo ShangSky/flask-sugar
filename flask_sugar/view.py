@@ -5,7 +5,9 @@ from functools import update_wrapper
 class View:
     """wrap view_func"""
 
-    def __init__(self, view_func: t.Optional[t.Callable] = None, doc_enable: bool = True) -> None:
+    def __init__(
+        self, view_func: t.Optional[t.Callable] = None, doc_enable: bool = True
+    ) -> None:
         self.view_func = view_func
         update_wrapper(self, view_func)  # type:ignore
         self.doc_enable = doc_enable

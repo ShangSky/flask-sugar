@@ -1,23 +1,29 @@
 from flask import current_app, render_template_string
 
-from typing import Optional, List, Dict, Union, Any, cast
+from typing import Optional, List, Dict, Union, Any, cast, TYPE_CHECKING
 
 from flask_sugar.templates import swagger_template, redoc_template
 from flask_sugar.view import View
 from flask_sugar.utils import convert_path
 
+if TYPE_CHECKING:
+    from flask_sugar.app import Sugar
+
+    current_app: Sugar
+
 
 def get_openapi_json(
-        openapi_version: str,
-        title: str,
-        version: str,
-        description: Optional[str] = "",
-        terms_service: Optional[str] = None,
-        contact: Optional[Dict[str, str]] = None,
-        license_: Optional[Dict[str, str]] = None,
-        servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
-        paths: Optional[Dict[str, Union[str, Any]]] = None,
-        components: Optional[List[Dict[str, Union[str, Any]]]] = None,
+    openapi_version: str,
+    title: str,
+    version: str,
+    tags: Optional[List[Dict[str, Any]]] = None,
+    description: Optional[str] = "",
+    terms_service: Optional[str] = None,
+    contact: Optional[Dict[str, str]] = None,
+    license_: Optional[Dict[str, str]] = None,
+    servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
+    paths: Optional[Dict[str, Union[str, Any]]] = None,
+    components: Optional[List[Dict[str, Union[str, Any]]]] = None,
 ) -> Dict[str, Any]:
     info: Dict[str, Any] = {"title": title, "version": version}
     if description:
@@ -32,6 +38,8 @@ def get_openapi_json(
         "openapi": openapi_version,
         "info": info,
     }
+    if tags:
+        source["tags"] = tags
     if servers:
         source["servers"] = servers
     if paths:
@@ -41,66 +49,40 @@ def get_openapi_json(
     return source
 
 
-def openapi_json_view():
-    openapi_version: str = current_app.config.get("SUGAR_OPENAPI_VERSION", "3.0.2")
-    title: str = current_app.config.get("SUGAR_TITLE", "FlaskSugar")
-    version: str = current_app.config.get("SUGAR_VERSION", "0.1.0")
-    description: Optional[str] = current_app.config.get("SUGAR_DESCRIPTION", "")
-    terms_service: Optional[str] = current_app.config.get("SUGAR_TERMS_SERVICE")
-    contact: Optional[Dict[str, str]] = current_app.config.get("SUGAR_CONTACT")
-    license_: Optional[Dict[str, str]] = current_app.config.get("SUGAR_LICENSE")
-    servers: Optional[List[Dict[str, Union[str, Any]]]] = current_app.config.get(
-        "SUGAR_SERVERS"
-    )
+def openapi_json_view() -> Dict[str, Any]:
     paths = collect_paths()
     components = {}
 
     return get_openapi_json(
-        openapi_version=openapi_version,
-        title=title,
-        version=version,
-        description=description,
-        terms_service=terms_service,
-        contact=contact,
-        license_=license_,
-        servers=servers,
-        paths=paths
+        openapi_version=current_app.openapi_version,
+        title=current_app.title,
+        version=current_app.doc_version,
+        tags=current_app.tags,
+        description=current_app.description,
+        terms_service=current_app.terms_service,
+        contact=current_app.contact,
+        license_=current_app.license_,
+        servers=current_app.servers,
+        paths=paths,
     )
 
 
-def swagger():
-    openapi_json_url: str = current_app.config.get("SUGAR_OPENAPI_JSON_URL", "/openapi.json")
-    title: str = current_app.config.get("SUGAR_TITLE", "FlaskSugar")
-    swagger_js_url: str = current_app.config.get(
-        "SUGAR_SWAGGER_JS_URL",
-        "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js",
-    )
-    swagger_css_url: str = current_app.config.get(
-        "SUGAR_SWAGGER_CSS_URL",
-        "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
-    )
-
+def swagger() -> str:
     return render_template_string(
         swagger_template,
-        openapi_json_url=openapi_json_url,
-        title=title + " Swagger",
-        swagger_js_url=swagger_js_url,
-        swagger_css_url=swagger_css_url,
+        openapi_json_url=current_app.openapi_json_url,
+        title=current_app.title + " Swagger",
+        swagger_js_url=current_app.swagger_js_url,
+        swagger_css_url=current_app.swagger_css_url,
     )
 
 
-def redoc():
-    openapi_json_url: str = current_app.config.get("SUGAR_OPENAPI_JSON_URL", "/openapi.json")
-    title: str = current_app.config.get("SUGAR_TITLE", "FlaskSugar")
-    redoc_js_url: str = current_app.config.get(
-        "SUGAR_REDOC_JS_URL",
-        "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
-    )
+def redoc() -> str:
     return render_template_string(
         redoc_template,
-        openapi_json_url=openapi_json_url,
-        title=title + " Redoc",
-        redoc_js_url=redoc_js_url,
+        openapi_json_url=current_app.openapi_json_url,
+        title=current_app.title + " Redoc",
+        redoc_js_url=current_app.redoc_js_url,
     )
 
 
@@ -108,10 +90,10 @@ def collect_paths() -> Dict[str, Any]:
     allow_methods = {"get", "post", "put", "delete", "patch"}
     paths = {}
     for rule in current_app.url_map.iter_rules():
-        if rule.endpoint == 'static':
+        if rule.endpoint == "static":
             continue
         view: View = cast(View, current_app.view_functions[rule.endpoint])
-        if not getattr(view, 'doc_enable'):
+        if not getattr(view, "doc_enable"):
             continue
         path = convert_path(rule.rule)
         action_info = {}
