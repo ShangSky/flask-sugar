@@ -4,7 +4,6 @@ from typing import Optional, List, Dict, Union, Any, cast, TYPE_CHECKING
 
 from flask_sugar.templates import swagger_template, redoc_template
 from flask_sugar.view import View
-from flask_sugar.utils import convert_path
 
 if TYPE_CHECKING:
     from flask_sugar.app import Sugar
@@ -95,12 +94,11 @@ def collect_paths() -> Dict[str, Any]:
         view: View = cast(View, current_app.view_functions[rule.endpoint])
         if not getattr(view, "doc_enable"):
             continue
-        path = convert_path(rule.rule)
         action_info = {}
         for method in rule.methods:
             method: str = method.lower()
             if method in allow_methods:
-                action_info[method] = {}
+                action_info[method] = {"parameters": [{'in': arg_info.field_info.in_, 'name': arg_info.name} for arg_info in view.arg_infos]}
 
-        paths[path] = action_info
+        paths[view.path] = action_info
     return paths

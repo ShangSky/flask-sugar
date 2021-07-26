@@ -4,8 +4,11 @@ from typing_extensions import Literal
 from pydantic.fields import FieldInfo, Undefined
 
 
-class Param(FieldInfo):
-    in_: Literal["query", "header", "path", "cookie"]
+ParamTypes = Literal["query", "header", "path", "cookie"]
+
+
+class Param:
+    in_: ParamTypes
 
     def __init__(
         self,
@@ -29,7 +32,7 @@ class Param(FieldInfo):
         self.deprecated = deprecated
         self.example = example
         self.examples = examples
-        super().__init__(
+        self.field_info = FieldInfo(
             default,
             alias=alias,
             title=title,
@@ -45,7 +48,7 @@ class Param(FieldInfo):
         )
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.default})"
+        return f"{self.__class__.__name__}({self.field_info.default})"
 
 
 class Path(Param):

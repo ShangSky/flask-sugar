@@ -1,8 +1,10 @@
 import inspect
-import typing as t
 import re
+from typing import Set, Dict, Any, Callable
 
 from pydantic.typing import ForwardRef, evaluate_forwardref
+
+from flask_sugar import params
 
 
 def convert_path(url_rule: str) -> str:
@@ -22,13 +24,11 @@ def convert_path(url_rule: str) -> str:
     return "/".join(subs)
 
 
-def get_path_param_names(path: str) -> t.Set[str]:
+def get_path_param_names(path: str) -> Set[str]:
     return set(re.findall("{(.*?)}", path))
 
 
-def get_typed_annotation(
-    param: inspect.Parameter, globalns: t.Dict[str, t.Any]
-) -> t.Any:
+def get_typed_annotation(param: inspect.Parameter, globalns: Dict[str, Any]) -> Any:
     annotation = param.annotation
     if isinstance(annotation, str):
         annotation = ForwardRef(annotation)
@@ -36,7 +36,7 @@ def get_typed_annotation(
     return annotation
 
 
-def get_typed_signature(call: t.Callable) -> inspect.Signature:
+def get_typed_signature(call: Callable) -> inspect.Signature:
     signature = inspect.signature(call)
     globalns = getattr(call, "__globals__", {})
     typed_params = [
@@ -50,3 +50,17 @@ def get_typed_signature(call: t.Callable) -> inspect.Signature:
     ]
     typed_signature = inspect.Signature(typed_params)
     return typed_signature
+
+
+def get_param_annotation(param: inspect.Parameter) -> Any:
+    annotation = param.annotation
+
+    if annotation == param.empty:
+        if param.default == param.empty:
+            annotation = str
+        else:
+            if isinstance(param.default, params.Param):
+                annotation = type(param.default.default)
+            else:
+                annotation = type(param.default)
+    return annotation

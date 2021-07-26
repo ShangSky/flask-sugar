@@ -4,37 +4,38 @@ from flask import Flask
 
 from flask_sugar.blueprint import Blueprint
 from flask_sugar.openapi import openapi_json_view, swagger, redoc
+from flask_sugar.utils import convert_path, get_path_param_names
 from flask_sugar.view import View
 
 
 class Sugar(Flask):
     def __init__(
-        self,
-        import_name: str,
-        static_url_path: Optional[str] = None,
-        static_folder: Optional[str] = "static",
-        static_host: Optional[str] = None,
-        host_matching: bool = False,
-        subdomain_matching: bool = False,
-        template_folder: Optional[str] = "templates",
-        instance_path: Optional[str] = None,
-        instance_relative_config: bool = False,
-        root_path: Optional[str] = None,
-        title: str = "FlaskSugar",
-        doc_version: str = "0.1.0",
-        description: Optional[str] = None,
-        terms_service: Optional[str] = None,
-        contact: Optional[Dict[str, str]] = None,
-        license_: Optional[Dict[str, str]] = None,
-        servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
-        tags: Optional[List[Dict[str, Any]]] = None,
-        openapi_url_prefix: Optional[str] = None,
-        openapi_json_url: str = "/openapi.json",
-        swagger_url: str = "/doc",
-        redoc_url: str = "/redoc",
-        swagger_js_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js",
-        swagger_css_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
-        redoc_js_url: str = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
+            self,
+            import_name: str,
+            static_url_path: Optional[str] = None,
+            static_folder: Optional[str] = "static",
+            static_host: Optional[str] = None,
+            host_matching: bool = False,
+            subdomain_matching: bool = False,
+            template_folder: Optional[str] = "templates",
+            instance_path: Optional[str] = None,
+            instance_relative_config: bool = False,
+            root_path: Optional[str] = None,
+            title: str = "FlaskSugar",
+            doc_version: str = "0.1.0",
+            description: Optional[str] = None,
+            terms_service: Optional[str] = None,
+            contact: Optional[Dict[str, str]] = None,
+            license_: Optional[Dict[str, str]] = None,
+            servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
+            tags: Optional[List[Dict[str, Any]]] = None,
+            openapi_url_prefix: Optional[str] = None,
+            openapi_json_url: str = "/openapi.json",
+            swagger_url: str = "/doc",
+            redoc_url: str = "/redoc",
+            swagger_js_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js",
+            swagger_css_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
+            redoc_js_url: str = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
     ):
         super().__init__(
             import_name=import_name,
@@ -67,15 +68,16 @@ class Sugar(Flask):
         self.init_doc()
 
     def add_url_rule(
-        self,
-        rule: str,
-        endpoint: Optional[str] = None,
-        view_func: Optional[Callable] = None,
-        provide_automatic_options: Optional[bool] = None,
-        doc_enable: bool = True,
-        **options: Any,
+            self,
+            rule: str,
+            endpoint: Optional[str] = None,
+            view_func: Optional[Callable] = None,
+            provide_automatic_options: Optional[bool] = None,
+            doc_enable: bool = True,
+            **options: Any,
     ) -> None:
-        view = View(view_func, doc_enable)
+        path = convert_path(rule)
+        view = View(path=path, view_func=view_func, doc_enable=doc_enable, endpoint=endpoint)
         super().add_url_rule(rule, endpoint, view, provide_automatic_options, **options)
 
     def init_doc(self):
