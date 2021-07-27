@@ -1,9 +1,14 @@
+from inspect import getdoc
+
 from flask import current_app, render_template_string
 
 from typing import Optional, List, Dict, Union, Any, cast, TYPE_CHECKING
 
+from pydantic import BaseModel
+from pydantic.fields import ModelField, Undefined
+
 from flask_sugar.templates import swagger_template, redoc_template
-from flask_sugar.view import View
+from flask_sugar.view import View, ParameterInfo
 
 if TYPE_CHECKING:
     from flask_sugar.app import Sugar
@@ -85,6 +90,36 @@ def redoc() -> str:
     )
 
 
+def get_parameters(
+    model: Optional[BaseModel], parameter_infos: List[ParameterInfo]
+) -> List[Dict[str, Any]]:
+    if not model:
+        return []
+    model_fields: Dict[str, ModelField] = model.__fields__
+    properties = model.schema()["properties"]
+    doc_parameters = []
+    for parameter_info in parameter_infos:
+        model_field = model_fields[parameter_info.name]
+        field_info = parameter_info.parameter.field_info
+        doc_parameter = {
+            "name": model_field.alias,
+            "in": parameter_info.parameter.in_,
+            "schema": properties[model_field.alias],
+            "required": model_field.required,
+        }
+
+        if field_info.description:
+            doc_parameter["description"] = field_info.description
+        if parameter_info.parameter.examples:
+            doc_parameter["examples"] = parameter_info.parameter.examples
+        elif parameter_info.parameter.example != Undefined:
+            doc_parameter["example"] = parameter_info.parameter.example
+        if parameter_info.parameter.deprecated:
+            doc_parameter["deprecated"] = parameter_info.parameter.deprecated
+        doc_parameters.append(doc_parameter)
+    return doc_parameters
+
+
 def collect_paths() -> Dict[str, Any]:
     allow_methods = {"get", "post", "put", "delete", "patch"}
     paths = {}
@@ -96,9 +131,35 @@ def collect_paths() -> Dict[str, Any]:
             continue
         action_info = {}
         for method in rule.methods:
+            action_info_value = {}
             method: str = method.lower()
-            if method in allow_methods:
-                action_info[method] = {"parameters": [{'in': arg_info.field_info.in_, 'name': arg_info.name} for arg_info in view.arg_infos]}
+            if method not in allow_methods:
+                continue
+            doc_parameters = get_parameters(view.param_model, view.parameters)
+            if doc_parameters:
+                action_info_value["parameters"] = doc_parameters
+
+            tags = view.tags
+            if tags:
+                action_info_value["tags"] = tags
+
+            summary = view.summary or view.view_func.__name__.replace("_", " ").title()
+            if summary:
+                action_info_value["summary"] = summary
+
+            description = view.description or getdoc(view)
+            if description:
+                action_info_value["description"] = description
+
+            deprecated = view.deprecated
+            if deprecated:
+                action_info_value["deprecated"] = deprecated
+
+            operation_id = view.operation_id or rule.endpoint + "__" + method
+            if operation_id:
+                action_info_value["operation_id"] = operation_id
+
+            action_info[method] = action_info_value
 
         paths[view.path] = action_info
     return paths
