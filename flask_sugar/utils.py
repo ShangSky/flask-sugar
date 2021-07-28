@@ -1,17 +1,11 @@
 from __future__ import annotations
 import inspect
 import re
-from typing import Set, Dict, Any, Callable, List, TYPE_CHECKING, Type
+from typing import Set, Dict, Any, Callable
 
-from pydantic import BaseModel
-from pydantic.fields import ModelField
+
 from pydantic.typing import ForwardRef, evaluate_forwardref
-
 from flask_sugar import params
-
-if TYPE_CHECKING:
-    from flask_sugar.view import ParameterInfo
-    from flask_sugar.params import ParamTypes
 
 
 def convert_path(url_rule: str) -> str:
@@ -71,13 +65,3 @@ def get_param_annotation(param: inspect.Parameter) -> Any:
             else:
                 annotation = type(param.default)
     return annotation
-
-
-def get_alias_in_map(
-    parameters: List[ParameterInfo], param_model: Type[BaseModel]
-) -> Dict[str, ParamTypes]:
-    alias_in_map = {}
-    fields: Dict[str, ModelField] = param_model.__fields__
-    for parameter in parameters:
-        alias_in_map[fields[parameter.name].alias] = parameter.parameter.in_
-    return alias_in_map

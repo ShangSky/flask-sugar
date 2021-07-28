@@ -1,12 +1,13 @@
+from typing import Optional, List, Dict, Union, Any, cast, TYPE_CHECKING, Tuple
 from inspect import getdoc
 
 from flask import current_app, render_template_string
 
-from typing import Optional, List, Dict, Union, Any, cast, TYPE_CHECKING
 
 from pydantic import BaseModel
 from pydantic.fields import ModelField, Undefined
 
+from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX
 from flask_sugar.templates import swagger_template, redoc_template
 from flask_sugar.view import View, ParameterInfo
 
@@ -54,8 +55,7 @@ def get_openapi_json(
 
 
 def openapi_json_view() -> Dict[str, Any]:
-    paths = collect_paths()
-    components = {}
+    paths, components = collect_paths_components()
 
     return get_openapi_json(
         openapi_version=current_app.openapi_version,
@@ -68,6 +68,7 @@ def openapi_json_view() -> Dict[str, Any]:
         license_=current_app.license_,
         servers=current_app.servers,
         paths=paths,
+        components=components,
     )
 
 
@@ -120,9 +121,10 @@ def get_parameters(
     return doc_parameters
 
 
-def collect_paths() -> Dict[str, Any]:
-    allow_methods = {"get", "post", "put", "delete", "patch"}
+def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
     paths = {}
+    components = {}
+    schemas = {}
     for rule in current_app.url_map.iter_rules():
         if rule.endpoint == "static":
             continue
@@ -133,7 +135,7 @@ def collect_paths() -> Dict[str, Any]:
         for method in rule.methods:
             action_info_value = {}
             method: str = method.lower()
-            if method not in allow_methods:
+            if method not in ALLOW_METHODS:
                 continue
             doc_parameters = get_parameters(view.param_model, view.parameters)
             if doc_parameters:
@@ -160,6 +162,36 @@ def collect_paths() -> Dict[str, Any]:
                 action_info_value["operation_id"] = operation_id
 
             action_info[method] = action_info_value
+            if view.body_model:
+                body_model_name = view.body_model.__name__
+                schemas[body_model_name] = view.body_model.schema()
+                action_info_value["requestBody"] = {
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": REF_PREFIX + body_model_name}
+                        }
+                    },
+                    "required": True,
+                }
+            response_schema = {}
+            if view.response_model:
+                response_model_name = view.response_model.__name__
+                schemas[response_model_name] = view.response_model.schema()
+                response_schema["$ref"] = REF_PREFIX + response_model_name
 
+            responses = {
+                "200": {
+                    "description": view.response_description,
+                    "content": {"application/json": {"schema": response_schema}},
+                }
+            }
+
+            if view.responses:
+                responses.update(view.responses)
+            action_info_value["responses"] = responses
         paths[view.path] = action_info
-    return paths
+
+        if schemas:
+            components["schemas"] = schemas
+
+    return paths, components

@@ -10,7 +10,7 @@ from flask_sugar.params import ParamTypes
 from flask_sugar.utils import (
     get_path_param_names,
     get_typed_signature,
-    get_param_annotation, get_alias_in_map,
+    get_param_annotation,
 )
 
 
@@ -30,7 +30,8 @@ class View:
         tags: Optional[List[str]] = None,
         summary: Optional[str] = None,
         description: Optional[str] = None,
-        response_description: str = "Successful Response",
+        response_description: str = "success",
+        response_model: Optional[Type[BaseModel]] = None,
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
@@ -43,6 +44,7 @@ class View:
         self.summary = summary
         self.description = description
         self.response_description = response_description
+        self.response_model = response_model
         self.responses = responses
         self.deprecated = deprecated
         self.operation_id = operation_id
@@ -51,12 +53,20 @@ class View:
         field_definitions: Dict[str, Tuple[Any, FieldInfo]] = {}
         self.param_model: Optional[Type[BaseModel]] = None
         self.parameters: List[ParameterInfo] = []
+        self.body_model: Optional[Type[BaseModel]] = None
         for param_name, param in signature.parameters.items():
             if param.kind in (param.VAR_KEYWORD, param.VAR_POSITIONAL):
                 continue
             annotation = get_param_annotation(param)
-            if annotation in [list, List] or isinstance(param.annotation, BaseModel):
-                continue
+            try:
+                if issubclass(param.annotation, BaseModel):
+                    assert (
+                        self.body_model is None
+                    ), "a view_func require only one BaseModel field"
+                    self.body_model = param.annotation
+                    continue
+            except TypeError:
+                pass
             if param_name in path_param_names:
                 assert (param.default == param.empty) or isinstance(
                     param.default, params.Path
@@ -77,7 +87,6 @@ class View:
             self.parameters.append(ParameterInfo(name=param_name, parameter=parameter))
         if field_definitions:
             self.param_model = create_model("ParamModel", **field_definitions)
-        self.alias_in_map = get_alias_in_map(self.parameters, self.param_model) if self.param_model else {}
 
     @staticmethod
     def get_value(
@@ -100,12 +109,12 @@ class View:
         model_fields: Dict[str, ModelField] = self.param_model.__fields__
         values = {}
         for parameter in self.parameters:
+            model_field = model_fields[parameter.name]
             in_ = parameter.parameter.in_
-            alias = model_fields[parameter.name].alias
+            alias = model_field.alias
             value = self.get_value(in_, alias, parameter.name, kwargs)
             if value is not None:
                 values[alias] = value
-        print(self.alias_in_map)
         try:
             data = self.param_model(**values)
         except ValidationError as e:

@@ -1,6 +1,7 @@
-from typing import Optional, Callable, Any, Dict, List, Union
+from typing import Optional, Callable, Any, Dict, List, Union, Type, TYPE_CHECKING
 
 from flask import Flask
+from pydantic import BaseModel
 
 from flask_sugar.blueprint import Blueprint
 from flask_sugar.openapi import openapi_json_view, swagger, redoc
@@ -77,14 +78,20 @@ class Sugar(Flask):
         tags: Optional[List[str]] = None,
         summary: Optional[str] = None,
         description: Optional[str] = None,
-        response_description: str = "Successful Response",
+        response_model: Optional[Type[BaseModel]] = None,
+        response_description: str = "success",
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
         **options: Any,
     ) -> None:
         path = convert_path(rule)
-        view = View(path=path, view_func=view_func, doc_enable=doc_enable)
+        view = View(
+            path=path,
+            view_func=view_func,
+            doc_enable=doc_enable,
+            response_model=response_model,
+        )
         super().add_url_rule(rule, endpoint, view, provide_automatic_options, **options)
 
     def init_doc(self):
@@ -103,3 +110,26 @@ class Sugar(Flask):
             openapi_bp.add_url_rule(self.redoc_url, view_func=redoc, doc_enable=False)
 
         self.register_blueprint(openapi_bp)
+
+    if TYPE_CHECKING:
+
+        def get(
+            self,
+            rule: str,
+            endpoint: Optional[str] = None,
+            view_func: Optional[Callable] = None,
+            provide_automatic_options: Optional[bool] = None,
+            doc_enable: bool = True,
+            tags: Optional[List[str]] = None,
+            summary: Optional[str] = None,
+            description: Optional[str] = None,
+            response_model: Optional[Type[BaseModel]] = None,
+            response_description: str = "success",
+            responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
+            deprecated: Optional[bool] = None,
+            operation_id: Optional[str] = None,
+            **options: Any,
+        ) -> Callable:
+            ...
+
+        post = put = patch = delete = get
