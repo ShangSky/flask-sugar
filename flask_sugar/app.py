@@ -4,6 +4,8 @@ from flask import Flask
 from pydantic import BaseModel
 
 from flask_sugar.blueprint import Blueprint
+from flask_sugar.errorhandlers import validation_error_handler
+from flask_sugar.exceptions import RequestValidationError
 from flask_sugar.openapi import openapi_json_view, swagger, redoc
 from flask_sugar.utils import convert_path
 from flask_sugar.view import View
@@ -37,6 +39,7 @@ class Sugar(Flask):
         swagger_js_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js",
         swagger_css_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
         redoc_js_url: str = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
+        default_validation_errorhandler: Optional[Callable[..., Any]] = None,
     ):
         super().__init__(
             import_name=import_name,
@@ -66,6 +69,13 @@ class Sugar(Flask):
         self.swagger_js_url = swagger_js_url
         self.swagger_css_url = swagger_css_url
         self.redoc_js_url = redoc_js_url
+        error_handler = (
+            default_validation_errorhandler
+            if default_validation_errorhandler is not None
+            else validation_error_handler
+        )
+        self.register_error_handler(RequestValidationError, error_handler)
+
         self.init_doc()
 
     def add_url_rule(

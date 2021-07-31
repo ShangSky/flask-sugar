@@ -219,6 +219,8 @@ class Cookie(Param):
 
 
 class Body(FieldInfo):
+    request_attr = "json"
+
     def __init__(
         self,
         default: Any,
@@ -263,6 +265,8 @@ class Body(FieldInfo):
 
 
 class Form(Body):
+    request_attr = "form"
+
     def __init__(
         self,
         default: Any,
@@ -303,6 +307,8 @@ class Form(Body):
 
 
 class File(Form):
+    request_attr = "files"
+
     def __init__(
         self,
         default: Any,

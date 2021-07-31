@@ -1,11 +1,17 @@
 from __future__ import annotations
 import inspect
 import re
-from typing import Set, Dict, Any, Callable
-
+from typing import Set, Dict, Any, Callable, Type, Union, Tuple
 
 from pydantic.typing import ForwardRef, evaluate_forwardref
 from flask_sugar import params
+
+
+def is_subclass(x: Type[Any], y: Union[Type[Any], Tuple[Type[Any], ...]]) -> bool:
+    try:
+        return issubclass(x, y)
+    except TypeError:
+        return False
 
 
 def convert_path(url_rule: str) -> str:

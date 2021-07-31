@@ -162,12 +162,12 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 action_info_value["operation_id"] = operation_id
 
             action_info[method] = action_info_value
-            if view.body_model:
-                body_model_name = view.body_model.__name__
-                schemas[body_model_name] = view.body_model.schema()
+            if view.body_info:
+                body_model_name = view.body_info.model.__name__
+                schemas[body_model_name] = view.body_info.model.schema()
                 action_info_value["requestBody"] = {
                     "content": {
-                        "application/json": {
+                        view.body_info.parameter.media_type: {
                             "schema": {"$ref": REF_PREFIX + body_model_name}
                         }
                     },
