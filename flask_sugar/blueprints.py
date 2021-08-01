@@ -1,10 +1,42 @@
-from typing import Optional, Callable, Any, List, Type, Dict, Union, TYPE_CHECKING
+from typing import Optional, Callable, Any, List, Type, Dict, Union
 
 from flask import Blueprint as _Blueprint
 from pydantic import BaseModel
 
+from flask_sugar.typing import MethodsTypingMixin
 
-class Blueprint(_Blueprint):
+
+class Blueprint(_Blueprint, MethodsTypingMixin):
+    def __init__(
+        self,
+        name: str,
+        import_name: str,
+        static_folder: Optional[str] = None,
+        static_url_path: Optional[str] = None,
+        template_folder: Optional[str] = None,
+        url_prefix: Optional[str] = None,
+        subdomain: Optional[str] = None,
+        url_defaults: Optional[dict] = None,
+        root_path: Optional[str] = None,
+        cli_group: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        deprecated: Optional[bool] = None,
+    ):
+        super().__init__(
+            name,
+            import_name,
+            static_folder=static_folder,
+            static_url_path=static_url_path,
+            template_folder=template_folder,
+            url_prefix=url_prefix,
+            subdomain=subdomain,
+            url_defaults=url_defaults,
+            root_path=root_path,
+            cli_group=cli_group,
+        )
+        self.tags: List[str] = [name] if tags is None else tags
+        self.deprecated = deprecated
+
     def add_url_rule(
         self,
         rule: str,
@@ -31,6 +63,10 @@ class Blueprint(_Blueprint):
         if view_func and hasattr(view_func, "__name__") and "." in view_func.__name__:
             raise ValueError("'view_func' name may not contain a dot '.' character.")
 
+        current_tags = self.tags.copy()
+        if tags:
+            current_tags.extend(tags)
+
         self.record(
             lambda s: s.add_url_rule(
                 rule,
@@ -38,37 +74,14 @@ class Blueprint(_Blueprint):
                 view_func,
                 provide_automatic_options=provide_automatic_options,
                 doc_enable=doc_enable,
-                tags=tags,
+                tags=current_tags,
                 summary=summary,
                 description=description,
                 response_model=response_model,
                 response_description=response_description,
                 responses=responses,
-                deprecated=deprecated,
+                deprecated=deprecated or self.deprecated,
                 operation_id=operation_id,
                 **options,
             )
         )
-
-    if TYPE_CHECKING:
-
-        def get(
-            self,
-            rule: str,
-            endpoint: Optional[str] = None,
-            view_func: Optional[Callable] = None,
-            provide_automatic_options: Optional[bool] = None,
-            doc_enable: bool = True,
-            tags: Optional[List[str]] = None,
-            summary: Optional[str] = None,
-            description: Optional[str] = None,
-            response_model: Optional[Type[BaseModel]] = None,
-            response_description: str = "success",
-            responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
-            deprecated: Optional[bool] = None,
-            operation_id: Optional[str] = None,
-            **options: Any,
-        ) -> Callable:
-            ...
-
-        post = put = patch = delete = get

@@ -218,7 +218,7 @@ class Cookie(Param):
         )
 
 
-class Body(FieldInfo):
+class Body:
     request_attr = "json"
 
     def __init__(
@@ -245,7 +245,7 @@ class Body(FieldInfo):
         self.media_type = media_type
         self.example = example
         self.examples = examples
-        super().__init__(
+        self.field_info = FieldInfo(
             default,
             alias=alias,
             title=title,
@@ -261,7 +261,7 @@ class Body(FieldInfo):
         )
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.default})"
+        return f"{self.__class__.__name__}({self.field_info.default})"
 
 
 class Form(Body):
@@ -307,7 +307,7 @@ class Form(Body):
 
 
 class File(Form):
-    request_attr = "files"
+    in_: Literal["file"] = "file"
 
     def __init__(
         self,

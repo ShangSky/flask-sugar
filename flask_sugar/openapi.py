@@ -1,11 +1,21 @@
-from typing import Optional, List, Dict, Union, Any, cast, TYPE_CHECKING, Tuple
+from typing import (
+    Optional,
+    List,
+    Dict,
+    Type,
+    Union,
+    Any,
+    cast,
+    TYPE_CHECKING,
+    Tuple,
+    cast,
+)
 from inspect import getdoc
 
 from flask import current_app, render_template_string
-
-
 from pydantic import BaseModel
 from pydantic.fields import ModelField, Undefined
+from pydantic.schema import schema
 
 from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX
 from flask_sugar.templates import swagger_template, redoc_template
@@ -28,7 +38,7 @@ def get_openapi_json(
     license_: Optional[Dict[str, str]] = None,
     servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
     paths: Optional[Dict[str, Union[str, Any]]] = None,
-    components: Optional[List[Dict[str, Union[str, Any]]]] = None,
+    components: Optional[Dict[str, Union[str, Any]]] = None,
 ) -> Dict[str, Any]:
     info: Dict[str, Any] = {"title": title, "version": version}
     if description:
@@ -92,7 +102,7 @@ def redoc() -> str:
 
 
 def get_parameters(
-    model: Optional[BaseModel], parameter_infos: List[ParameterInfo]
+    model: Optional[Type[BaseModel]], parameter_infos: List[ParameterInfo]
 ) -> List[Dict[str, Any]]:
     if not model:
         return []
@@ -137,7 +147,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             method: str = method.lower()
             if method not in ALLOW_METHODS:
                 continue
-            doc_parameters = get_parameters(view.param_model, view.parameters)
+            doc_parameters = get_parameters(view.ParamModel, view.parameter_infos)
             if doc_parameters:
                 action_info_value["parameters"] = doc_parameters
 
@@ -164,7 +174,8 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             action_info[method] = action_info_value
             if view.body_info:
                 body_model_name = view.body_info.model.__name__
-                schemas[body_model_name] = view.body_info.model.schema()
+                FormModel = view.FormModel
+                schemas[body_model_name] = FormModel.schema() if FormModel else view.body_info.model.schema()
                 action_info_value["requestBody"] = {
                     "content": {
                         view.body_info.parameter.media_type: {
@@ -179,7 +190,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 schemas[response_model_name] = view.response_model.schema()
                 response_schema["$ref"] = REF_PREFIX + response_model_name
 
-            responses = {
+            responses: Dict[Union[int, str], Dict[str, Any]] = {
                 "200": {
                     "description": view.response_description,
                     "content": {"application/json": {"schema": response_schema}},

@@ -1,10 +1,18 @@
-from __future__ import annotations
 import inspect
 import re
-from typing import Set, Dict, Any, Callable, Type, Union, Tuple
+from typing import Set, Dict, Any, Callable, Type, List, Union, Tuple, Optional
 
 from pydantic.typing import ForwardRef, evaluate_forwardref
 from flask_sugar import params
+from flask_sugar.typing import get_origin
+
+
+def is_list_type(annotation: Type[Any]) -> bool:
+    return annotation in [list, List] or get_origin(annotation) in [list, List]
+
+
+def get_list_value(value: Optional[str]) -> List[str]:
+    return [] if value is None else value.split(",")
 
 
 def is_subclass(x: Type[Any], y: Union[Type[Any], Tuple[Type[Any], ...]]) -> bool:

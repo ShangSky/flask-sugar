@@ -3,15 +3,16 @@ from typing import Optional, Callable, Any, Dict, List, Union, Type, TYPE_CHECKI
 from flask import Flask
 from pydantic import BaseModel
 
-from flask_sugar.blueprint import Blueprint
+from flask_sugar.blueprints import Blueprint
 from flask_sugar.errorhandlers import validation_error_handler
 from flask_sugar.exceptions import RequestValidationError
 from flask_sugar.openapi import openapi_json_view, swagger, redoc
 from flask_sugar.utils import convert_path
 from flask_sugar.view import View
+from flask_sugar.typing import MethodsTypingMixin
 
 
-class Sugar(Flask):
+class Sugar(Flask, MethodsTypingMixin):
     def __init__(
         self,
         import_name: str,
@@ -96,11 +97,19 @@ class Sugar(Flask):
         **options: Any,
     ) -> None:
         path = convert_path(rule)
+        assert view_func, "view_func can't be None"
         view = View(
             path=path,
             view_func=view_func,
             doc_enable=doc_enable,
+            tags=tags,
+            summary=summary,
+            description=description,
+            response_description=response_description,
             response_model=response_model,
+            responses=responses,
+            deprecated=deprecated,
+            operation_id=operation_id,
         )
         super().add_url_rule(rule, endpoint, view, provide_automatic_options, **options)
 
@@ -120,26 +129,3 @@ class Sugar(Flask):
             openapi_bp.add_url_rule(self.redoc_url, view_func=redoc, doc_enable=False)
 
         self.register_blueprint(openapi_bp)
-
-    if TYPE_CHECKING:
-
-        def get(
-            self,
-            rule: str,
-            endpoint: Optional[str] = None,
-            view_func: Optional[Callable] = None,
-            provide_automatic_options: Optional[bool] = None,
-            doc_enable: bool = True,
-            tags: Optional[List[str]] = None,
-            summary: Optional[str] = None,
-            description: Optional[str] = None,
-            response_model: Optional[Type[BaseModel]] = None,
-            response_description: str = "success",
-            responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
-            deprecated: Optional[bool] = None,
-            operation_id: Optional[str] = None,
-            **options: Any,
-        ) -> Callable:
-            ...
-
-        post = put = patch = delete = get
