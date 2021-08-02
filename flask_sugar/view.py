@@ -1,5 +1,4 @@
 from functools import update_wrapper
-from re import S
 from typing import (
     Optional,
     Callable,
@@ -12,12 +11,15 @@ from typing import (
     Union,
     Type,
     Generic,
+    TYPE_CHECKING,
 )
 
-from typing_extensions import Literal
+from flask.typing import ResponseReturnValue
+from typing_extensions import Literal, TypedDict
 from flask import request
-from pydantic import BaseModel, create_model, ValidationError
+from pydantic import BaseModel, create_model, ValidationError, create_model_from_typeddict
 from pydantic.fields import FieldInfo, ModelField
+from werkzeug.datastructures import FileStorage
 
 from flask_sugar import params
 from flask_sugar.exceptions import RequestValidationError
@@ -29,6 +31,9 @@ from flask_sugar.utils import (
     is_list_type,
     is_subclass,
 )
+
+if TYPE_CHECKING:
+    from pydantic.typing import AbstractSetIntStr, MappingIntStrAny
 
 
 class BodyInfo(NamedTuple):
@@ -63,7 +68,14 @@ class View:
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
+        response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_by_alias: bool = True,
+        response_model_exclude_unset: bool = False,
+        response_model_exclude_defaults: bool = False,
+        response_model_exclude_none: bool = False,
     ) -> None:
+
         self.path = path
         self.view_func = view_func
         update_wrapper(self, view_func)  # type:ignore
@@ -76,16 +88,28 @@ class View:
         self.responses = responses
         self.deprecated = deprecated
         self.operation_id = operation_id
-        field_definitions: Dict[str, Tuple[Any, FieldInfo]] = {}
         self.ParamModel: Optional[Type[BaseModel]] = None
         self.FormModel: Optional[Type[BaseModel]] = None
         self.parameter_infos: List[ParameterInfo[params.Param]] = []
         self.file_infos: List[ParameterInfo[params.File]] = []
         self.body_info: Optional[BodyInfo] = None
+        self.response_model_include = response_model_include
+        self.response_model_exclude = response_model_exclude
+        self.response_model_by_alias = response_model_by_alias
+        self.response_model_exclude_unset = response_model_exclude_unset
+        self.response_model_exclude_defaults = response_model_exclude_defaults
+        self.response_model_exclude_none = response_model_exclude_none
 
+        field_definitions: Dict[str, Tuple[Any, FieldInfo]] = {}
         path_param_names = get_path_param_names(path)
         signature = get_typed_signature(view_func)
         file_definitions: Dict[str, Tuple[Any, FieldInfo]] = {}
+        if not response_model:
+            if is_subclass(signature.return_annotation, TypedDict):
+                self.response_model = create_model_from_typeddict(signature.return_annotation)
+            elif is_subclass(signature.return_annotation, BaseModel):
+                self.response_model = signature.return_annotation
+
         for param_name, param in signature.parameters.items():
             if param.kind in (param.VAR_KEYWORD, param.VAR_POSITIONAL):
                 continue
@@ -109,15 +133,20 @@ class View:
                 )
                 continue
             if isinstance(param.default, params.File):
-                # TODO: 加上判断类型是否为(bytes, List[bytes], FileStorage, List[FileStorage])
+                if param.annotation == param.empty:
+                    annotation = FileStorage
+                is_list = is_list_type(annotation)
                 self.file_infos.append(
                     ParameterInfo(
                         name=param.name,
-                        is_list=is_list_type(annotation),
+                        is_list=is_list,
                         parameter=param.default,
                     )
                 )
-                file_definitions[param_name] = (bytes, param.default.field_info)
+                file_definitions[param_name] = (
+                    List[bytes] if is_list else bytes,
+                    param.default.field_info,
+                )
                 continue
 
             if param_name in path_param_names:
@@ -147,6 +176,9 @@ class View:
             self.ParamModel = create_model("ParamModel", **field_definitions)
 
         if self.file_infos and self.body_info:
+            assert isinstance(
+                self.body_info.parameter, params.Form
+            ), "file field cant not coexist with body field"
             self.FormModel = create_model(
                 "FormModel", __base__=self.body_info.model, **file_definitions
             )
@@ -211,8 +243,7 @@ class View:
         if self.body_info:
             body_values = getattr(request, self.body_info.parameter.request_attr) or {}
             try:
-                body_data = self.body_info.model(**body_values)
-                kwargs[self.body_info.name] = body_data.dict()
+                kwargs[self.body_info.name] = self.body_info.model(**body_values)
             except ValidationError as e:
                 errors.append(e.errors())
 
@@ -224,14 +255,30 @@ class View:
 
         return kwargs, errors
 
+    def create_response(
+        self, response: Union[ResponseReturnValue, BaseModel]
+    ) -> ResponseReturnValue:
+        if isinstance(response, BaseModel):
+            return response.dict()
+        if isinstance(response, dict) and self.response_model:
+            return self.response_model(**response).dict(
+                include=self.response_model_include,
+                exclude=self.response_model_exclude,
+                by_alias=self.response_model_by_alias,
+                exclude_unset=self.response_model_exclude_unset,
+                exclude_defaults=self.response_model_exclude_defaults,
+                exclude_none=self.response_model_exclude_none,
+            )
+        return response
+
     def __call__(self, **kwargs) -> Any:
         if self.view_func is None:
             return self.view_func
         cleaned_data, errors = self.inject_data(kwargs)
         if errors:
             raise RequestValidationError(errors)
-
-        return self.view_func(**cleaned_data)
+        response = self.view_func(**cleaned_data)
+        return self.create_response(response)
 
     def __str__(self):
         return f"View(view_func={self.view_func}, doc_enable={self.doc_enable})"

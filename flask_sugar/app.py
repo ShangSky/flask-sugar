@@ -12,6 +12,10 @@ from flask_sugar.view import View
 from flask_sugar.typing import MethodsTypingMixin
 
 
+if TYPE_CHECKING:
+    from pydantic.typing import AbstractSetIntStr, MappingIntStrAny
+
+
 class Sugar(Flask, MethodsTypingMixin):
     def __init__(
         self,
@@ -94,6 +98,12 @@ class Sugar(Flask, MethodsTypingMixin):
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
+        response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_by_alias: bool = True,
+        response_model_exclude_unset: bool = False,
+        response_model_exclude_defaults: bool = False,
+        response_model_exclude_none: bool = False,
         **options: Any,
     ) -> None:
         path = convert_path(rule)

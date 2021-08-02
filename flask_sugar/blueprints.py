@@ -1,9 +1,12 @@
-from typing import Optional, Callable, Any, List, Type, Dict, Union
+from typing import Optional, Callable, Any, List, Type, Dict, Union, TYPE_CHECKING
 
 from flask import Blueprint as _Blueprint
 from pydantic import BaseModel
 
 from flask_sugar.typing import MethodsTypingMixin
+
+if TYPE_CHECKING:
+    from pydantic.typing import AbstractSetIntStr, MappingIntStrAny
 
 
 class Blueprint(_Blueprint, MethodsTypingMixin):
@@ -52,6 +55,12 @@ class Blueprint(_Blueprint, MethodsTypingMixin):
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
+        response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_by_alias: bool = True,
+        response_model_exclude_unset: bool = False,
+        response_model_exclude_defaults: bool = False,
+        response_model_exclude_none: bool = False,
         **options: Any,
     ) -> None:
         """Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for
@@ -82,6 +91,12 @@ class Blueprint(_Blueprint, MethodsTypingMixin):
                 responses=responses,
                 deprecated=deprecated or self.deprecated,
                 operation_id=operation_id,
+                response_model_include=response_model_include,
+                response_model_exclude=response_model_exclude,
+                response_model_by_alias=response_model_by_alias,
+                response_model_exclude_unset=response_model_exclude_unset,
+                response_model_exclude_defaults=response_model_exclude_defaults,
+                response_model_exclude_none=response_model_exclude_none,
                 **options,
             )
         )

@@ -50,6 +50,9 @@ class Param:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.field_info.default})"
 
+    def get_request_value(self) -> Any:
+        ...
+
 
 class Path(Param):
     in_ = "path"

@@ -1,4 +1,4 @@
-from typing import Optional, Callable, List, Type, Dict, Union, Any, TYPE_CHECKING
+from typing import Optional, Callable, List, Type, Dict, Union, Any, TYPE_CHECKING, Set
 
 from pydantic import BaseModel
 
@@ -12,6 +12,7 @@ except ImportError:  # pragma: no coverage
 
 class MethodsTypingMixin:
     if TYPE_CHECKING:
+        from pydantic.typing import AbstractSetIntStr, MappingIntStrAny
 
         def get(
             self,
@@ -28,6 +29,16 @@ class MethodsTypingMixin:
             responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
             deprecated: Optional[bool] = None,
             operation_id: Optional[str] = None,
+            response_model_include: Union[
+                "AbstractSetIntStr", "MappingIntStrAny"
+            ] = None,
+            response_model_exclude: Union[
+                "AbstractSetIntStr", "MappingIntStrAny"
+            ] = None,
+            response_model_by_alias: bool = True,
+            response_model_exclude_unset: bool = False,
+            response_model_exclude_defaults: bool = False,
+            response_model_exclude_none: bool = False,
             **options: Any,
         ) -> Callable:
             ...

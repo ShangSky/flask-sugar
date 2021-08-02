@@ -174,13 +174,21 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             action_info[method] = action_info_value
             if view.body_info:
                 body_model_name = view.body_info.model.__name__
-                FormModel = view.FormModel
-                schemas[body_model_name] = FormModel.schema() if FormModel else view.body_info.model.schema()
+                if view.FormModel:
+                    body_model_name += "_" + view.FormModel.__name__
+                schemas[body_model_name] = (
+                    view.FormModel.schema()
+                    if view.FormModel
+                    else view.body_info.model.schema()
+                )
+                media_type = (
+                    "multipart/form-data"
+                    if view.FormModel
+                    else view.body_info.parameter.media_type
+                )
                 action_info_value["requestBody"] = {
                     "content": {
-                        view.body_info.parameter.media_type: {
-                            "schema": {"$ref": REF_PREFIX + body_model_name}
-                        }
+                        media_type: {"schema": {"$ref": REF_PREFIX + body_model_name}}
                     },
                     "required": True,
                 }
