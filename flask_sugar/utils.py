@@ -3,8 +3,18 @@ import re
 from typing import Set, Dict, Any, Callable, Type, List, Union, Tuple, Optional
 
 from pydantic.typing import ForwardRef, evaluate_forwardref
+from typing_extensions import TypedDict
+
 from flask_sugar import params
 from flask_sugar.typing import get_origin
+
+
+def is_typed_dict(cls: Type[TypedDict]) -> bool:
+    return (
+        hasattr(cls, "__required_keys__")
+        and hasattr(cls, "__optional_keys__")
+        and hasattr(cls, "__total__")
+    )
 
 
 def is_list_type(annotation: Type[Any]) -> bool:
@@ -63,7 +73,9 @@ def get_typed_signature(call: Callable) -> inspect.Signature:
         )
         for param in signature.parameters.values()
     ]
-    typed_signature = inspect.Signature(typed_params, return_annotation=signature.return_annotation)
+    typed_signature = inspect.Signature(
+        typed_params, return_annotation=signature.return_annotation
+    )
     return typed_signature
 
 

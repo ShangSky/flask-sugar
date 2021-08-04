@@ -29,7 +29,7 @@ from flask_sugar.utils import (
     get_typed_signature,
     get_param_annotation,
     is_list_type,
-    is_subclass,
+    is_subclass, is_typed_dict,
 )
 
 if TYPE_CHECKING:
@@ -105,7 +105,7 @@ class View:
         signature = get_typed_signature(view_func)
         file_definitions: Dict[str, Tuple[Any, FieldInfo]] = {}
         if not response_model:
-            if is_subclass(signature.return_annotation, TypedDict):
+            if is_typed_dict(signature.return_annotation):
                 self.response_model = create_model_from_typeddict(signature.return_annotation)
             elif is_subclass(signature.return_annotation, BaseModel):
                 self.response_model = signature.return_annotation
