@@ -15,9 +15,14 @@ from typing import (
 )
 
 from flask.typing import ResponseReturnValue
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Literal
 from flask import request
-from pydantic import BaseModel, create_model, ValidationError, create_model_from_typeddict
+from pydantic import (
+    BaseModel,
+    create_model,
+    ValidationError,
+    create_model_from_typeddict,
+)
 from pydantic.fields import FieldInfo, ModelField
 from werkzeug.datastructures import FileStorage
 
@@ -29,7 +34,8 @@ from flask_sugar.utils import (
     get_typed_signature,
     get_param_annotation,
     is_list_type,
-    is_subclass, is_typed_dict,
+    is_subclass,
+    is_typed_dict,
 )
 
 if TYPE_CHECKING:
@@ -106,7 +112,9 @@ class View:
         file_definitions: Dict[str, Tuple[Any, FieldInfo]] = {}
         if not response_model:
             if is_typed_dict(signature.return_annotation):
-                self.response_model = create_model_from_typeddict(signature.return_annotation)
+                self.response_model = create_model_from_typeddict(
+                    signature.return_annotation
+                )
             elif is_subclass(signature.return_annotation, BaseModel):
                 self.response_model = signature.return_annotation
 

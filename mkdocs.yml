@@ -1,0 +1,24 @@
+site_name: Flask Sugar
+site_description: Flask Sugar is a web framework for building APIs with Flask, Pydantic and Python 3.6+ type hints.
+site_url: https://apiflask.com
+theme:
+  name: material
+  palette:
+    primary: red
+  icon:
+    logo: material/candycane
+    repo: fontawesome/brands/github
+repo_url: https://github.com/ShangSky/flask-sugar
+repo_name: ShangSky/flask-sugar
+edit_uri: ""
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.progressbar
+  - attr_list

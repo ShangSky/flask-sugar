@@ -5,7 +5,6 @@ from typing import (
     Type,
     Union,
     Any,
-    cast,
     TYPE_CHECKING,
     Tuple,
     cast,
@@ -15,7 +14,6 @@ from inspect import getdoc
 from flask import current_app, render_template_string
 from pydantic import BaseModel
 from pydantic.fields import ModelField, Undefined
-from pydantic.schema import schema
 
 from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX
 from flask_sugar.templates import swagger_template, redoc_template
