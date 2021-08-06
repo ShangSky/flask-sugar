@@ -210,5 +210,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
         if schemas:
             components["schemas"] = schemas
+    if current_app.security_schemes:
+        components['securitySchemes'] = current_app.security_schemes
 
     return paths, components

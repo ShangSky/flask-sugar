@@ -37,6 +37,7 @@ class Sugar(Flask, MethodsTypingMixin):
         license_: Optional[Dict[str, str]] = None,
         servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
         tags: Optional[List[Dict[str, Any]]] = None,
+        security_schemes: Optional[Dict[str, Any]] = None,
         openapi_url_prefix: Optional[str] = None,
         openapi_json_url: str = "/openapi.json",
         swagger_url: str = "/doc",
@@ -66,6 +67,7 @@ class Sugar(Flask, MethodsTypingMixin):
         self.license_ = license_
         self.servers = servers
         self.tags = tags
+        self.security_schemes = security_schemes
         self.openapi_url_prefix = openapi_url_prefix
         self.openapi_json_url = openapi_json_url
         self.swagger_url = swagger_url
