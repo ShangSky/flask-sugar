@@ -5,6 +5,8 @@ check parameters and generate API documents automatically
 
 Documentation: <https://shangsky.github.io/flask-sugar>
 
+Source Code: <https://github.com/shangsky/flask-sugar>
+
 
 ## Requirements
 
