@@ -8,6 +8,7 @@ theme:
   icon:
     logo: material/candycane
     repo: fontawesome/brands/github
+  favicon: https://github.com/ShangSky/flask-sugar/raw/main/assets/favicon.ico
   features:
     - navigation.expand
     - navigation.top
