@@ -51,11 +51,11 @@ $ flask run --reload
 
 Now visit the API documentation with Swagger UI at http://localhost:5000/doc:
 
-![](https://github.com/ShangSky/flask-sugar/raw/f776c2783118fb245a01f73835e1ce3fc8150d30/assets/swagger-ui.png)
+![](img/swagger-ui.png)
 
 visit the API documentation with Redoc at http://localhost:5000/redoc:
 
-![](https://github.com/ShangSky/flask-sugar/raw/f776c2783118fb245a01f73835e1ce3fc8150d30/assets/redoc.png)
+![](img/redoc.png)
 
 ## License
 

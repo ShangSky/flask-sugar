@@ -85,3 +85,8 @@ def multi_str(a: int = Path(..., gt=3), b: str = Path(..., max_length=4)):
 ```
 
 In this example, value of a must greater than 3, length of b must greater than 4
+
+### Documentation
+
+Now, when you open your browser at <http://localhost:5000/doc>, you will see the automatic, interactive, API documentation.
+![FLask Sugar Swagger](../img/path-swagger.png)
