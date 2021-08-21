@@ -52,11 +52,11 @@ $ flask run --reload
   * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-Now visit the API documentation with Swagger UI at http://localhost:5000/doc:
+现在访问swagger文档地址 http://localhost:5000/doc:
 
 ![](docs/img/swagger-ui.png)
 
-visit the API documentation with Redoc at http://localhost:5000/redoc:
+访问Redoc文档地址 http://localhost:5000/redoc:
 
 ![](docs/img/redoc.png)
 
