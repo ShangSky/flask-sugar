@@ -1,31 +1,31 @@
 # Flask Sugar
 
-- [简体中文](README_cn.md)
+- [English](README.md)
 
-Flask Sugar is a web framework for building APIs with Flask, Pydantic and Python 3.6+ type hints.
+Flask Sugar是一个基于flask, pyddantic和类型注解的API框架.
 
-check parameters and generate API documents automatically
+可以检查参数并自动生成API文档
 
-Documentation: <https://shangsky.github.io/flask-sugar>
+文档: <https://shangsky.github.io/flask-sugar>
 
-Source Code: <https://github.com/shangsky/flask-sugar>
+源码: <https://github.com/shangsky/flask-sugar>
 
 
-## Requirements
+## 依赖
 
 - Python 3.6+
 - Flask 2.0+
 
-## Installation
+## 安装
 
 ```shell
 $ pip install flask-sugar
 ```
 
-## A Simple Example
+## 简单的例子
 
 ```python
-# save this as main.py
+# 保存为main.py
 from typing import Any
 
 from flask_sugar import Sugar
@@ -52,14 +52,14 @@ $ flask run --reload
   * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-现在访问swagger文档地址 http://localhost:5000/doc:
+Now visit the API documentation with Swagger UI at http://localhost:5000/doc:
 
 ![](docs/img/swagger-ui.png)
 
-访问Redoc文档地址 http://localhost:5000/redoc:
+visit the API documentation with Redoc at http://localhost:5000/redoc:
 
 ![](docs/img/redoc.png)
 
-## License
+## 许可证
 
-This project is licensed under the terms of the MIT license.
+此项目使用MIT许可证.
