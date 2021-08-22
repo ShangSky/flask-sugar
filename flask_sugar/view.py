@@ -24,7 +24,7 @@ from pydantic import (
     create_model_from_typeddict,
 )
 from pydantic.fields import FieldInfo, ModelField
-from werkzeug.datastructures import FileStorage
+from werkzeug.datastructures import FileStorage, ImmutableMultiDict
 
 from flask_sugar import params
 from flask_sugar.exceptions import RequestValidationError
@@ -250,6 +250,8 @@ class View:
 
         if self.body_info:
             body_values = getattr(request, self.body_info.parameter.request_attr) or {}
+            if isinstance(body_values, ImmutableMultiDict):
+                body_values = body_values.to_dict()
             try:
                 kwargs[self.body_info.name] = self.body_info.model(**body_values)
             except ValidationError as e:

@@ -1,6 +1,6 @@
 # Flask Sugar
 
-- [简体中文](README_cn.md)
+- [简体中文](README_zh.md)
 
 Flask Sugar is a web framework for building APIs with Flask, Pydantic and Python 3.6+ type hints.
 
