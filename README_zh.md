@@ -54,11 +54,11 @@ $ flask run --reload
 
 现在访问swagger文档地址 http://localhost:5000/doc:
 
-![](docs/img/swagger-ui.png)
+![](https://github.com/ShangSky/flask-sugar/raw/main/docs/img/swagger-ui.png)
 
 访问Redoc文档地址 http://localhost:5000/redoc:
 
-![](docs/img/redoc.png)
+![](https://github.com/ShangSky/flask-sugar/blob/main/docs/img/redoc.png)
 
 ## 许可证
 
