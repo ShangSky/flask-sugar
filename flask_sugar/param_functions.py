@@ -1,7 +1,8 @@
 from typing import Any, Dict, Optional
 
-from flask_sugar import params
 from pydantic.fields import Undefined
+
+from flask_sugar import params
 
 
 def Path(

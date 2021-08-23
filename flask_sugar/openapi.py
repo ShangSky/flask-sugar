@@ -1,23 +1,13 @@
-from typing import (
-    Optional,
-    List,
-    Dict,
-    Type,
-    Union,
-    Any,
-    TYPE_CHECKING,
-    Tuple,
-    cast,
-)
 from inspect import getdoc
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Type, Union, cast
 
 from flask import current_app, render_template_string
 from pydantic import BaseModel
 from pydantic.fields import ModelField, Undefined
 
 from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX
-from flask_sugar.templates import swagger_template, redoc_template
-from flask_sugar.view import View, ParameterInfo
+from flask_sugar.templates import redoc_template, swagger_template
+from flask_sugar.view import ParameterInfo, View
 
 if TYPE_CHECKING:
     from flask_sugar.app import Sugar
@@ -170,20 +160,22 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 action_info_value["operation_id"] = operation_id
 
             action_info[method] = action_info_value
-            if view.body_info:
-                body_model_name = view.body_info.model.__name__
+            if view.body_info or view.FormModel:
                 if view.FormModel:
-                    body_model_name += "_" + view.FormModel.__name__
-                schemas[body_model_name] = (
-                    view.FormModel.schema()
-                    if view.FormModel
-                    else view.body_info.model.schema()
-                )
-                media_type = (
-                    "multipart/form-data"
-                    if view.FormModel
-                    else view.body_info.parameter.media_type
-                )
+                    body_model_name = rule.endpoint + "_" + view.FormModel.__name__
+                    schemas[body_model_name] = view.FormModel.schema()
+                    media_type = "multipart/form-data"
+                else:
+                    body_model_name = (
+                        rule.endpoint
+                        + "_"
+                        + view.body_info.model.__name__  # type:ignore
+                    )
+                    schemas[
+                        body_model_name
+                    ] = view.body_info.model.schema()  # type:ignore
+                    media_type = view.body_info.parameter.media_type  # type:ignore
+
                 action_info_value["requestBody"] = {
                     "content": {
                         media_type: {"schema": {"$ref": REF_PREFIX + body_model_name}}
@@ -192,7 +184,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 }
             response_schema = {}
             if view.response_model:
-                response_model_name = view.response_model.__name__
+                response_model_name = rule.endpoint + "_" + view.response_model.__name__
                 schemas[response_model_name] = view.response_model.schema()
                 response_schema["$ref"] = REF_PREFIX + response_model_name
 

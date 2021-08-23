@@ -1,4 +1,4 @@
-from typing import Optional, Callable, List, Type, Dict, Union, Any, TYPE_CHECKING, Set
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set, Type, Union
 
 from pydantic import BaseModel
 

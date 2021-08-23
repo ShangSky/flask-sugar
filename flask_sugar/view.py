@@ -1,38 +1,39 @@
 from functools import update_wrapper
 from typing import (
-    Optional,
-    Callable,
+    TYPE_CHECKING,
     Any,
-    List,
+    Callable,
     Dict,
-    Tuple,
+    Generic,
+    List,
     NamedTuple,
+    Optional,
+    Tuple,
+    Type,
     TypeVar,
     Union,
-    Type,
-    Generic,
-    TYPE_CHECKING,
 )
 
-from flask.typing import ResponseReturnValue
-from typing_extensions import Literal
 from flask import request
+from flask.typing import ResponseReturnValue
 from pydantic import (
     BaseModel,
-    create_model,
     ValidationError,
+    create_model,
     create_model_from_typeddict,
 )
 from pydantic.fields import FieldInfo, ModelField
-from werkzeug.datastructures import FileStorage, ImmutableMultiDict
+from typing_extensions import Literal
+from werkzeug.datastructures import ImmutableMultiDict
 
 from flask_sugar import params
+from flask_sugar.datastructures import UploadFile
 from flask_sugar.exceptions import RequestValidationError
 from flask_sugar.utils import (
     get_list_value,
+    get_param_annotation,
     get_path_param_names,
     get_typed_signature,
-    get_param_annotation,
     is_list_type,
     is_subclass,
     is_typed_dict,
@@ -96,6 +97,7 @@ class View:
         self.operation_id = operation_id
         self.ParamModel: Optional[Type[BaseModel]] = None
         self.FormModel: Optional[Type[BaseModel]] = None
+        self.FileModel: Optional[Type[BaseModel]] = None
         self.parameter_infos: List[ParameterInfo[params.Param]] = []
         self.file_infos: List[ParameterInfo[params.File]] = []
         self.body_info: Optional[BodyInfo] = None
@@ -141,8 +143,9 @@ class View:
                 )
                 continue
             if isinstance(param.default, params.File):
+                annotation = param.annotation
                 if param.annotation == param.empty:
-                    annotation = FileStorage
+                    annotation = UploadFile
                 is_list = is_list_type(annotation)
                 self.file_infos.append(
                     ParameterInfo(
@@ -151,10 +154,7 @@ class View:
                         parameter=param.default,
                     )
                 )
-                file_definitions[param_name] = (
-                    List[bytes] if is_list else bytes,
-                    param.default.field_info,
-                )
+                file_definitions[param_name] = (annotation, param.default.field_info)
                 continue
 
             if param_name in path_param_names:
@@ -183,12 +183,17 @@ class View:
         if field_definitions:
             self.ParamModel = create_model("ParamModel", **field_definitions)
 
-        if self.file_infos and self.body_info:
-            assert isinstance(
-                self.body_info.parameter, params.Form
-            ), "file field cant not coexist with body field"
+        if self.file_infos:
+            if self.body_info:
+                assert isinstance(
+                    self.body_info.parameter, params.Form
+                ), "file field cant not coexist with body field"
+                base_model = self.body_info.model
+            else:
+                base_model = None
+            self.FileModel = create_model("FileModel", **file_definitions)
             self.FormModel = create_model(
-                "FormModel", __base__=self.body_info.model, **file_definitions
+                "FormModel", __base__=base_model, **file_definitions
             )
 
     @staticmethod
@@ -257,11 +262,16 @@ class View:
             except ValidationError as e:
                 errors.append(e.errors())
 
-        if self.FormModel:
+        if self.FileModel:
             files = self.get_request_values(
-                self.file_infos, self.FormModel, kwargs, False
+                self.file_infos, self.FileModel, kwargs, False
             )
-            kwargs.update(files)
+
+            try:
+                file_model = self.FileModel(**files)
+                kwargs.update(file_model.dict())
+            except ValidationError as e:
+                errors.append(e.errors())
 
         return kwargs, errors
 

@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Any, Dict, List, Union, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Type, Union
 
 from flask import Flask
 from pydantic import BaseModel
@@ -6,11 +6,10 @@ from pydantic import BaseModel
 from flask_sugar.blueprints import Blueprint
 from flask_sugar.errorhandlers import validation_error_handler
 from flask_sugar.exceptions import RequestValidationError
-from flask_sugar.openapi import openapi_json_view, swagger, redoc
+from flask_sugar.openapi import openapi_json_view, redoc, swagger
+from flask_sugar.typing import MethodsTypingMixin
 from flask_sugar.utils import convert_path
 from flask_sugar.view import View
-from flask_sugar.typing import MethodsTypingMixin
-
 
 if TYPE_CHECKING:
     from pydantic.typing import AbstractSetIntStr, MappingIntStrAny

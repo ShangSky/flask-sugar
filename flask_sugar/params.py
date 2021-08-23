@@ -1,8 +1,7 @@
 from typing import Any, Dict, Optional
 
-from typing_extensions import Literal
 from pydantic.fields import FieldInfo, Undefined
-
+from typing_extensions import Literal
 
 ParamTypes = Literal["query", "header", "path", "cookie"]
 

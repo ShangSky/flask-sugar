@@ -30,7 +30,7 @@ markdown_extensions:
 extra:
   alternate:
     - name: English
-      link: en/
+      link: /en
       lang: en
     - name: 简体中文
       link: zh/

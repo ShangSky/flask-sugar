@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Any, List, Type, Dict, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Type, Union
 
 from flask import Blueprint as _Blueprint
 from pydantic import BaseModel
