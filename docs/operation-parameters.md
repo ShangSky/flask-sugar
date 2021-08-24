@@ -43,7 +43,7 @@ def demo2():
 
 Tagged operations may be handled differently by various tools and libraries. For example, the Swagger UI uses tags to group the displayed operations.
 
-![Summary`](/img/operation-tags.png)
+![Summary](img/operation-tags.png)
 
 ### Blueprint tags
 
