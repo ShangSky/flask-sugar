@@ -14,7 +14,7 @@ swagger_template: str = """
     <!-- `SwaggerUIBundle` is now available on the page -->
     <script>
         const ui = SwaggerUIBundle({
-            url: "{{ openapi_json_url }}",
+            url: "{{ url_for('openapi.openapi_json_view') }}",
             dom_id: '#swagger-ui',
             presets: [
                 SwaggerUIBundle.presets.apis,
@@ -53,7 +53,7 @@ redoc_template: str = """
 </head>
 
 <body>
-    <redoc spec-url="{{ openapi_json_url }}"></redoc>
+    <redoc spec-url="{{ url_for('openapi.openapi_json_view') }}"></redoc>
     <script src="{{ redoc_js_url }}"> </script>
 </body>
 

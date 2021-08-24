@@ -241,8 +241,8 @@ class View:
 
     def inject_data(
         self, kwargs: Dict[str, Any]
-    ) -> Tuple[Dict[str, Any], List[List[Dict[str, Any]]]]:
-        errors: List[List[Dict[str, Any]]] = []
+    ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+        errors: List[Dict[str, Any]] = []
         if self.ParamModel:
             request_values = self.get_request_values(
                 self.parameter_infos, self.ParamModel, kwargs
@@ -251,7 +251,7 @@ class View:
                 param_data = self.ParamModel(**request_values)
                 kwargs.update(param_data.dict())
             except ValidationError as e:
-                errors.append(e.errors())
+                errors.extend(e.errors())
 
         if self.body_info:
             body_values = getattr(request, self.body_info.parameter.request_attr) or {}
@@ -260,7 +260,7 @@ class View:
             try:
                 kwargs[self.body_info.name] = self.body_info.model(**body_values)
             except ValidationError as e:
-                errors.append(e.errors())
+                errors.extend(e.errors())
 
         if self.FileModel:
             files = self.get_request_values(
@@ -271,7 +271,7 @@ class View:
                 file_model = self.FileModel(**files)
                 kwargs.update(file_model.dict())
             except ValidationError as e:
-                errors.append(e.errors())
+                errors.extend(e.errors())
 
         return kwargs, errors
 

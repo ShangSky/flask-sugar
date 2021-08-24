@@ -36,7 +36,7 @@ extra:
       link: zh/
       lang: zh
 nav:
-  - index.md
+  - "Quick Start": index.md
   - Parameters:
     - params/path-params.md
     - params/query-params.md
@@ -46,5 +46,6 @@ nav:
     - params/form-data.md
     - params/file-uploads.md
   - response.md
-  - schemas.md
   - handling-errors.md
+  - sugar-parameters.md
+  - operation-parameters.md
