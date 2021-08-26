@@ -46,15 +46,15 @@ def index(cookie_value: Optional[str] = Cookie(None)):
 !!! info
     To declare cookies, you need to use `Cookie`, because otherwise the parameters would be interpreted as query parameters.
 
-## Duplicate cookies
+## List cookies
 
-It is possible to receive duplicate cookies. That means, the same cookie with multiple values.
+It is possible to receive a cookie with multiple values.
 
 You can define those cases using a list in the type declaration.
 
-You will receive all the values from the duplicate cookie as a Python `list`.
+You will split the value in the cookie into a Python `list`.
 
-For example, to declare a cookie of `values` that can appear more than once, you can write:
+For example, to declare a cookie values with multiple values, you can write:
 
 ```python hl_lines="9"
 from flask_sugar import Sugar, Cookie
@@ -67,7 +67,7 @@ def index(values: List[str] = Cookie(None)):
     return {"values": values}
 ```
 
-If you communicate with that *path operation* sending two HTTP cookies like:
+If you communicate with that *path operation* sending a cookie like:
 
 ```
 values: foo,bar

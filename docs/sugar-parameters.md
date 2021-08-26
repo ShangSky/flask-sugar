@@ -116,7 +116,7 @@ It takes a list containing one dictionary for each tag.
 
 Each dictionary can contain:
 
-* `name` (**required**): a `str` with the same tag name you use in the `tags` parameter in your *path operations* and `APIRouter`s.
+* `name` (**required**): a `str` with the same tag name you use in the `tags` parameter in your *path operations* and `Blueprint`s.
 * `description`: a `str` with a short description for the tag. It can have Markdown and will be shown in the docs UI.
 * `externalDocs`: a `dict` describing external documentation with:
     * `description`: a `str` with a short description for the external docs.
@@ -166,7 +166,7 @@ Notice that you can use Markdown inside of the descriptions, for example "login"
 
 ### Use your tags
 
-Use the `tags` parameter with your *path operations* (and `APIRouter`s) to assign them to different tags:
+Use the `tags` parameter with your *path operations* (and `Blueprint`s) to assign them to different tags:
 
 ```Python hl_lines="21  26"
 from flask_sugar import Sugar

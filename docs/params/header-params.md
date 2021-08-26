@@ -60,15 +60,15 @@ Also, HTTP headers are case-insensitive, so, you can declare them with standard 
 
 So, you can use `user_agent` as you normally would in Python code, instead of needing to capitalize the first letters as `User_Agent` or something similar.
 
-## Duplicate headers
+## List headers
 
-It is possible to receive duplicate headers. That means, the same header with multiple values.
+It is possible to receive a header with multiple values.
 
 You can define those cases using a list in the type declaration.
 
-You will receive all the values from the duplicate header as a Python `list`.
+You will split the value in the header into a Python `list`.
 
-For example, to declare a header of `X-Token` that can appear more than once, you can write:
+For example, to declare a header values with multiple values, you can write:
 
 ```python hl_lines="9"
 from flask_sugar import Sugar, Header
@@ -81,7 +81,7 @@ def index(x_token: List[str] = Header(None)):
     return {"X-Token values": x_token}
 ```
 
-If you communicate with that *path operation* sending two HTTP headers like:
+If you communicate with that *path operation* sending a HTTP headers like:
 
 ```
 X-Token: foo,bar

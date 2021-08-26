@@ -110,10 +110,10 @@ def index() -> UserInfo:
 ```
 
 !!! note
-    You can't use TypedDict in **path operations** or in **view func**.  
+    You can't use TypedDict in params of **path operations** or in **decorator**.  
     It only works in return value typehint.
 
-It checks the return value both type check statically and at runtime
+It checks the return value of **path operations** both type check statically and at runtime
 
 ## Response Model encoding parameters
 
