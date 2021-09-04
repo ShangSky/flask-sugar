@@ -19,32 +19,40 @@ Source Code: <https://github.com/shangsky/flask-sugar>
 $ pip install flask-sugar
 ```
 
-## A Simple Example
+## Example
 
 ```python
-# save this as main.py
-from typing import Any
-
-from flask_sugar import Sugar
-from typing_extensions import TypedDict
+# save this as app.py
+from flask_sugar import Sugar, Header
+from pydantic import BaseModel
 
 app = Sugar(__name__)
 
 
-class Resp(TypedDict):
-    code: int
-    msg: str
-    data: Any
+class Item(BaseModel):
+    name: str
+    age: int
 
 
-@app.get("/")
-def index() -> Resp:
-    """index page"""
-    return {"code": 0, "msg": "success", "data": {}}
+class Resp(BaseModel):
+    a: int
+    b: str
+    c: str
+    item: Item
+
+
+@app.post("/item/{a}")
+def demo(
+    a: int,  # path param
+    item: Item,  # json body param
+    b: str = "default_query_param_b",  # query param
+    c: str = Header("default_header_param_b"),  # request header param
+) -> Resp:
+    """demo page"""
+    return Resp(a=a, b=b, c=c, item=Item(name="fasf", size=123))
 ```
 
 ```shell
-$ export FLASK_APP=main:app
 $ flask run --reload
   * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```

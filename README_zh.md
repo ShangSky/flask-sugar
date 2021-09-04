@@ -22,32 +22,40 @@ Flask Sugar是一个基于flask, pyddantic和类型注解的API框架.
 $ pip install flask-sugar
 ```
 
-## 简单的例子
+## 例子
 
 ```python
-# 保存为main.py
-from typing import Any
-
-from flask_sugar import Sugar
-from typing_extensions import TypedDict
+# 保存为app.py
+from flask_sugar import Sugar, Header
+from pydantic import BaseModel
 
 app = Sugar(__name__)
 
 
-class Resp(TypedDict):
-    code: int
-    msg: str
-    data: Any
+class Item(BaseModel):
+    name: str
+    size: int
 
 
-@app.get("/")
-def index() -> Resp:
-    """index page"""
-    return {"code": 0, "msg": "success", "data": {}}
+class Resp(BaseModel):
+    a: int
+    b: str
+    c: str
+    item: Item
+
+
+@app.post("/item/<a>")
+def demo(
+    a: int,  # 路径参数
+    item: Item,  # 请求体json参数
+    b: str = "default_query_param_b",  # 查询参数
+    c: str = Header("default_header_param_b"),  # 请求头参数
+) -> Resp:
+    """demo page"""
+    return Resp(a=a, b=b, c=c, item=item)
 ```
 
 ```shell
-$ export FLASK_APP=main:app
 $ flask run --reload
   * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
