@@ -31,6 +31,7 @@ from flask_sugar.datastructures import UploadFile
 from flask_sugar.exceptions import RequestValidationError
 from flask_sugar.utils import (
     get_list_value,
+    get_long_obj_name,
     get_param_annotation,
     get_path_param_names,
     get_typed_signature,
@@ -115,7 +116,8 @@ class View:
         if not response_model:
             if is_typed_dict(signature.return_annotation):
                 self.response_model = create_model_from_typeddict(
-                    signature.return_annotation
+                    signature.return_annotation,
+                    __module__=signature.return_annotation.__module__,
                 )
             elif is_subclass(signature.return_annotation, BaseModel):
                 self.response_model = signature.return_annotation
@@ -181,7 +183,9 @@ class View:
                 )
             )
         if field_definitions:
-            self.ParamModel = create_model("ParamModel", **field_definitions)
+            self.ParamModel = create_model(
+                get_long_obj_name(view_func, "ParamModel"), **field_definitions
+            )
 
         if self.file_infos:
             if self.body_info:
@@ -191,9 +195,13 @@ class View:
                 base_model = self.body_info.model
             else:
                 base_model = None
-            self.FileModel = create_model("FileModel", **file_definitions)
+            self.FileModel = create_model(
+                get_long_obj_name(view_func, "FileModel"), **file_definitions
+            )
             self.FormModel = create_model(
-                "FormModel", __base__=base_model, **file_definitions
+                get_long_obj_name(view_func, "FormModel"),
+                __base__=base_model,
+                **file_definitions,
             )
 
     @staticmethod

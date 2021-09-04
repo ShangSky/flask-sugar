@@ -1,9 +1,27 @@
 from inspect import getdoc
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Type, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+    cast,
+)
 
 from flask import current_app, render_template_string
 from pydantic import BaseModel
 from pydantic.fields import ModelField, Undefined
+from pydantic.schema import (
+    TypeModelSet,
+    get_flat_models_from_models,
+    get_model_name_map,
+    schema,
+)
 
 from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX
 from flask_sugar.templates import redoc_template, swagger_template
@@ -119,13 +137,30 @@ def get_parameters(
     return doc_parameters
 
 
+def get_flat_models_from_views(view_functions: Iterable[Callable]) -> TypeModelSet:
+    models = []
+    for view in view_functions:
+        if not isinstance(view, View) and getattr(view, "doc_enable"):
+            continue
+        if view.body_info or view.FormModel:
+            if view.FormModel:
+                models.append(view.FormModel)
+            else:
+                models.append(view.body_info.model)  # type:ignore
+        if view.response_model:
+            models.append(view.response_model)
+    return get_flat_models_from_models(models)
+
+
 def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
     paths = {}
     components = {}
-    schemas = {}
+    flat_models = get_flat_models_from_views(current_app.view_functions.values())
+    model_name_map = get_model_name_map(flat_models)
+    schemas = schema(flat_models, ref_prefix=REF_PREFIX).get(  # type:ignore
+        "definitions", {}
+    )
     for rule in current_app.url_map.iter_rules():
-        if rule.endpoint == "static":
-            continue
         view: View = cast(View, current_app.view_functions[rule.endpoint])
         if not getattr(view, "doc_enable"):
             continue
@@ -162,18 +197,12 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             action_info[method] = action_info_value
             if view.body_info or view.FormModel:
                 if view.FormModel:
-                    body_model_name = rule.endpoint + "_" + view.FormModel.__name__
-                    schemas[body_model_name] = view.FormModel.schema()
+                    body_model_name = model_name_map[view.FormModel]
                     media_type = "multipart/form-data"
                 else:
-                    body_model_name = (
-                        rule.endpoint
-                        + "_"
-                        + view.body_info.model.__name__  # type:ignore
-                    )
-                    schemas[
-                        body_model_name
-                    ] = view.body_info.model.schema()  # type:ignore
+                    body_model_name = model_name_map[
+                        view.body_info.model  # type:ignore
+                    ]
                     media_type = view.body_info.parameter.media_type  # type:ignore
 
                 action_info_value["requestBody"] = {
@@ -184,9 +213,9 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 }
             response_schema = {}
             if view.response_model:
-                response_model_name = rule.endpoint + "_" + view.response_model.__name__
-                schemas[response_model_name] = view.response_model.schema()
-                response_schema["$ref"] = REF_PREFIX + response_model_name
+                response_schema["$ref"] = (
+                    REF_PREFIX + model_name_map[view.response_model]
+                )
 
             responses: Dict[Union[int, str], Dict[str, Any]] = {
                 "200": {

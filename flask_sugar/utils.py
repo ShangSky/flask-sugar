@@ -3,18 +3,13 @@ import re
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
 
 from pydantic.typing import ForwardRef, evaluate_forwardref
-from typing_extensions import TypedDict
 
 from flask_sugar import params
 from flask_sugar.typing import get_origin
 
 
-def is_typed_dict(cls: Type[TypedDict]) -> bool:
-    return (
-        hasattr(cls, "__required_keys__")
-        and hasattr(cls, "__optional_keys__")
-        and hasattr(cls, "__total__")
-    )
+def is_typed_dict(cls: Any) -> bool:
+    return hasattr(cls, "__required_keys__")
 
 
 def is_list_type(annotation: Type[Any]) -> bool:
@@ -91,3 +86,10 @@ def get_param_annotation(param: inspect.Parameter) -> Any:
             else:
                 annotation = type(param.default)
     return annotation
+
+
+def get_long_obj_name(obj: Any, suffix: Optional[str] = None) -> str:
+    name = f"{obj.__module__}__{obj.__name__}"
+    if suffix:
+        name += f"__{suffix}"
+    return name.replace(".", "__")

@@ -108,6 +108,8 @@ class Sugar(Flask):
     ) -> None:
         path = convert_path(rule)
         assert view_func, "view_func can't be None"
+        if endpoint == "static":
+            doc_enable = False
         view = View(
             path=path,
             view_func=view_func,

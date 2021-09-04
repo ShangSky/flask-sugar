@@ -5,7 +5,9 @@ from setuptools import setup, find_packages
 with open("flask_sugar/__init__.py", "r") as f:
     version = re.search(
         r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
-    ).group(1)
+    ).group( # type:ignore
+        1
+    )  
 with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
