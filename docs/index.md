@@ -31,7 +31,7 @@ app = Sugar(__name__)
 
 class Item(BaseModel):
     name: str
-    age: int
+    size: int
 
 
 class Resp(BaseModel):
@@ -41,7 +41,7 @@ class Resp(BaseModel):
     item: Item
 
 
-@app.post("/item/{a}")
+@app.post("/item/<a>")
 def demo(
     a: int,  # path param
     item: Item,  # json body param
@@ -49,7 +49,7 @@ def demo(
     c: str = Header("default_header_param_b"),  # request header param
 ) -> Resp:
     """demo page"""
-    return Resp(a=a, b=b, c=c, item=Item(name="fasf", size=123))
+    return Resp(a=a, b=b, c=c, item=item)
 ```
 
 ```shell
