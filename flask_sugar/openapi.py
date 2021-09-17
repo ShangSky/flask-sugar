@@ -17,13 +17,16 @@ from flask import current_app, render_template_string
 from pydantic import BaseModel
 from pydantic.fields import ModelField, Undefined
 from pydantic.schema import (
+    TypeModelOrEnum,
     TypeModelSet,
+    default_ref_template,
     get_flat_models_from_models,
     get_model_name_map,
+    model_process_schema,
     schema,
 )
 
-from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX
+from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX, REF_TEMPLATE
 from flask_sugar.templates import redoc_template, swagger_template
 from flask_sugar.view import ParameterInfo, View
 
@@ -113,7 +116,7 @@ def get_parameters(
     if not model:
         return []
     model_fields: Dict[str, ModelField] = model.__fields__
-    properties = model.schema()["properties"]
+    properties = model.schema(ref_template=REF_TEMPLATE)["properties"]
     doc_parameters = []
     for parameter_info in parameter_infos:
         model_field = model_fields[parameter_info.name]
@@ -142,6 +145,8 @@ def get_flat_models_from_views(view_functions: Iterable[Callable]) -> TypeModelS
     for view in view_functions:
         if not isinstance(view, View) and getattr(view, "doc_enable"):
             continue
+        if view.ParamModel:
+            models.append(view.ParamModel)
         if view.body_info or view.FormModel:
             if view.FormModel:
                 models.append(view.FormModel)
@@ -152,14 +157,46 @@ def get_flat_models_from_views(view_functions: Iterable[Callable]) -> TypeModelS
     return get_flat_models_from_models(models)
 
 
+def schema(
+    models: TypeModelSet,
+    *,
+    model_name_map: Dict[TypeModelOrEnum, str],
+    by_alias: bool = True,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    ref_prefix: Optional[str] = None,
+    ref_template: str = default_ref_template,
+) -> Dict[str, Any]:
+    definitions = {}
+    output_schema: Dict[str, Any] = {}
+    if title:
+        output_schema["title"] = title
+    if description:
+        output_schema["description"] = description
+    for model in models:
+        m_schema, m_definitions, m_nested_models = model_process_schema(
+            model,
+            by_alias=by_alias,
+            model_name_map=model_name_map,
+            ref_prefix=ref_prefix,
+            ref_template=ref_template,
+        )
+        definitions.update(m_definitions)
+        model_name = model_name_map[model]
+        definitions[model_name] = m_schema
+    if definitions:
+        output_schema["definitions"] = definitions
+    return output_schema
+
+
 def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
     paths = {}
     components = {}
     flat_models = get_flat_models_from_views(current_app.view_functions.values())
     model_name_map = get_model_name_map(flat_models)
-    schemas = schema(flat_models, ref_prefix=REF_PREFIX).get(  # type:ignore
-        "definitions", {}
-    )
+    schemas = schema(
+        flat_models, model_name_map=model_name_map, ref_prefix=REF_PREFIX
+    ).get("definitions", {})
     for rule in current_app.url_map.iter_rules():
         view: View = cast(View, current_app.view_functions[rule.endpoint])
         if not getattr(view, "doc_enable"):
