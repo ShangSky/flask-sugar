@@ -264,7 +264,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             if view.responses:
                 responses.update(view.responses)
             action_info_value["responses"] = responses
-        paths[view.path] = action_info
+        paths.setdefault(view.path, {}).update(action_info)
 
         if schemas:
             components["schemas"] = schemas
