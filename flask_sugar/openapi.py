@@ -229,7 +229,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
             operation_id = view.operation_id or rule.endpoint + "__" + method
             if operation_id:
-                action_info_value["operation_id"] = operation_id
+                action_info_value["operationId"] = operation_id
 
             action_info[method] = action_info_value
             if view.body_info or view.FormModel:
