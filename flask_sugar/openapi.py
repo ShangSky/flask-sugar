@@ -227,6 +227,10 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             if deprecated:
                 action_info_value["deprecated"] = deprecated
 
+            security = view.security
+            if security:
+                action_info_value["security"] = [{key: []} for key in current_app.security_schemes.keys()]
+
             operation_id = view.operation_id or rule.endpoint + "__" + method
             if operation_id:
                 action_info_value["operationId"] = operation_id

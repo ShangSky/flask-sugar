@@ -75,6 +75,7 @@ class View:
         response_model: Optional[Type[BaseModel]] = None,
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
+        security: Optional[bool] = None,
         operation_id: Optional[str] = None,
         response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
         response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
@@ -95,6 +96,7 @@ class View:
         self.response_model = response_model
         self.responses = responses
         self.deprecated = deprecated
+        self.security = security
         self.operation_id = operation_id
         self.ParamModel: Optional[Type[BaseModel]] = None
         self.FormModel: Optional[Type[BaseModel]] = None
