@@ -76,6 +76,8 @@ class View:
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
+        security: Optional[List[Dict[str, Any]]] = None,
+        extra: Optional[Dict[str, Any]] = None,
         response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
         response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
         response_model_by_alias: bool = True,
@@ -96,6 +98,8 @@ class View:
         self.responses = responses
         self.deprecated = deprecated
         self.operation_id = operation_id
+        self.security = security
+        self.extra = extra
         self.ParamModel: Optional[Type[BaseModel]] = None
         self.FormModel: Optional[Type[BaseModel]] = None
         self.FileModel: Optional[Type[BaseModel]] = None
@@ -308,5 +312,5 @@ class View:
         response = self.view_func(**cleaned_data)
         return self.create_response(response)
 
-    def __str__(self):
+    def __repr__(self):
         return f"View(view_func={self.view_func}, doc_enable={self.doc_enable})"

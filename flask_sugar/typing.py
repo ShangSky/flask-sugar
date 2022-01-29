@@ -31,6 +31,8 @@ class MethodTyping:
             responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
             deprecated: Optional[bool] = None,
             operation_id: Optional[str] = None,
+            security: Optional[List[Dict[str, Any]]] = None,
+            extra: Optional[Dict[str, Any]] = None,
             response_model_include: Union[
                 "AbstractSetIntStr", "MappingIntStrAny"
             ] = None,
@@ -60,6 +62,8 @@ class MethodTyping:
             responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
             deprecated: Optional[bool] = None,
             operation_id: Optional[str] = None,
+            security: Optional[List[Dict[str, Any]]] = None,
+            extra: Optional[Dict[str, Any]] = None,
             response_model_include: Union[
                 "AbstractSetIntStr", "MappingIntStrAny"
             ] = None,
@@ -89,6 +93,8 @@ class MethodTyping:
             responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
             deprecated: Optional[bool] = None,
             operation_id: Optional[str] = None,
+            security: Optional[List[Dict[str, Any]]] = None,
+            extra: Optional[Dict[str, Any]] = None,
             response_model_include: Union[
                 "AbstractSetIntStr", "MappingIntStrAny"
             ] = None,
@@ -118,6 +124,8 @@ class MethodTyping:
             responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
             deprecated: Optional[bool] = None,
             operation_id: Optional[str] = None,
+            security: Optional[List[Dict[str, Any]]] = None,
+            extra: Optional[Dict[str, Any]] = None,
             response_model_include: Union[
                 "AbstractSetIntStr", "MappingIntStrAny"
             ] = None,

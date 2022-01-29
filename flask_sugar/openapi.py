@@ -117,7 +117,7 @@ def get_parameters(
         return []
     model_fields: Dict[str, ModelField] = model.__fields__
     properties = model.schema(ref_template=REF_TEMPLATE)["properties"]
-    doc_parameters = []
+    parameters = []
     for parameter_info in parameter_infos:
         model_field = model_fields[parameter_info.name]
         field_info = parameter_info.parameter.field_info
@@ -136,8 +136,8 @@ def get_parameters(
             doc_parameter["example"] = parameter_info.parameter.example
         if parameter_info.parameter.deprecated:
             doc_parameter["deprecated"] = parameter_info.parameter.deprecated
-        doc_parameters.append(doc_parameter)
-    return doc_parameters
+        parameters.append(doc_parameter)
+    return parameters
 
 
 def get_flat_models_from_views(view_functions: Iterable[Callable]) -> TypeModelSet:
@@ -201,37 +201,38 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
         view: View = cast(View, current_app.view_functions[rule.endpoint])
         if not getattr(view, "doc_enable"):
             continue
-        action_info = {}
+        path_item = {}
         for method in rule.methods:
-            action_info_value = {}
+            operation = {}
             method: str = method.lower()
             if method not in ALLOW_METHODS:
                 continue
-            doc_parameters = get_parameters(view.ParamModel, view.parameter_infos)
-            if doc_parameters:
-                action_info_value["parameters"] = doc_parameters
+            parameters = get_parameters(view.ParamModel, view.parameter_infos)
+            if parameters:
+                operation["parameters"] = parameters
 
-            tags = view.tags
-            if tags:
-                action_info_value["tags"] = tags
+            if view.tags:
+                operation["tags"] = view.tags
 
             summary = view.summary or view.view_func.__name__.replace("_", " ").title()
             if summary:
-                action_info_value["summary"] = summary
+                operation["summary"] = summary
 
             description = view.description or getdoc(view)
             if description:
-                action_info_value["description"] = description
+                operation["description"] = description
 
-            deprecated = view.deprecated
-            if deprecated:
-                action_info_value["deprecated"] = deprecated
+            if view.deprecated:
+                operation["deprecated"] = view.deprecated
 
             operation_id = view.operation_id or rule.endpoint + "__" + method
             if operation_id:
-                action_info_value["operationId"] = operation_id
+                operation["operationId"] = operation_id
 
-            action_info[method] = action_info_value
+            if view.security:
+                operation["security"] = view.security
+
+            path_item[method] = operation
             if view.body_info or view.FormModel:
                 if view.FormModel:
                     body_model_name = model_name_map[view.FormModel]
@@ -242,7 +243,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                     ]
                     media_type = view.body_info.parameter.media_type  # type:ignore
 
-                action_info_value["requestBody"] = {
+                operation["requestBody"] = {
                     "content": {
                         media_type: {"schema": {"$ref": REF_PREFIX + body_model_name}}
                     },
@@ -263,8 +264,10 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
             if view.responses:
                 responses.update(view.responses)
-            action_info_value["responses"] = responses
-        paths.setdefault(view.path, {}).update(action_info)
+            operation["responses"] = responses
+            if view.extra:
+                operation.update(view.extra)
+        paths.setdefault(view.path, {}).update(path_item)
 
         if schemas:
             components["schemas"] = schemas
