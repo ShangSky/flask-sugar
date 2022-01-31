@@ -33,6 +33,9 @@ You can set the following fields that are used in the OpenAPI specification and 
 | `license_` | `dict` | The license information for the exposed API. It can contain several fields. <details><summary><code>license_</code> fields</summary><table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>name</code></td><td><code>str</code></td><td><strong>REQUIRED</strong> (if a <code>license_</code> is set). The license name used for the API.</td></tr><tr><td><code>url</code></td><td><code>str</code></td><td>A URL to the license used for the API. MUST be in the format of a URL.</td></tr></tbody></table></details> |
 | `servers` | `list` | An array of Server Objects, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a Server Object with a url value of /. |
 | `security_schemes` | `dict` | Defines a security scheme that can be used by the operations. Supported schemes are HTTP authentication, an API key (either as a header, a cookie parameter or as a query parameter), OAuth2's common flows (implicit, password, client credentials and authorization code) as defined in RFC6749, and OpenID Connect Discovery.  <details><summary><code>security_schemes</code> fields</summary><table><thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>str</code></td><td>REQUIRED. The type of the security scheme. Valid values are "apiKey", "http", "oauth2", "openIdConnect".</td></tr><tr><td><code>description</code></td><td><code>str</code></td><td>A short description for security scheme. CommonMark syntax MAY be used for rich text representation.</td></tr><tr><td><code>name</code></td><td><code>str</code></td><td>	REQUIRED. The name of the header, query or cookie parameter to be used.</td></tr><tr><td><code>in</code></td><td><code>str</code></td><td>	REQUIRED. The location of the API key. Valid values are "query", "header" or "cookie".</td></tr><tr></tr><tr><td><code>etc</code></td></tr></tbody></table></details>|
+| `enable_doc` | `bool` | Enable API document, default `True` |
+| `cache_openapi_json` | `bool` | Whether to cache OpenAPI json, default `True` |
+| `doc_route_filter` | `DocRouteFilter` | API Documentation Route Filter |
 
 !!! Tip
     more info in [swagger documentation](https://swagger.io/specification/)
@@ -108,6 +111,7 @@ With this configuration, the automatic API docs would look like:
 
 ![](img/sugar-parameters01.png)
 ![](img/sugar-parameters02.png)
+
 ## Metadata for tags
 
 You can also add additional metadata for the different tags used to group your path operations with the parameter `tags`.

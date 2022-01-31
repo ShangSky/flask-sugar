@@ -51,6 +51,7 @@ nav:
     - handling-errors.md
     - sugar-parameters.md
     - operation-parameters.md
+    - doc-route-filter.md
   - 中文文档:
     - 快速开始: zh/index.md
     - 请求参数:
@@ -65,3 +66,4 @@ nav:
     - zh/handling-errors.md
     - zh/sugar-parameters.md
     - zh/operation-parameters.md
+    - zh/doc-route-filter.md

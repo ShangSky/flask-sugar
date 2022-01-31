@@ -175,3 +175,11 @@ If you want to set it individually for each operation, use the `operation_id` ar
 def new_task():
     ...
 ```
+
+## Security
+
+A declaration of which security mechanisms can be used for this operation. The list of values includes alternative security requirement objects that can be used. Only one of the security requirement objects need to be satisfied to authorize a request. To make security optional, an empty security requirement ({}) can be included in the array. This definition overrides any declared top-level security. To remove a top-level security declaration, an empty array can be used.
+
+## Extra
+
+The rest of the Operation properties can override all the properties previously set

@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Type, Union
 
 from flask import Flask
@@ -7,7 +8,7 @@ from flask_sugar.blueprints import Blueprint
 from flask_sugar.errorhandlers import validation_error_handler
 from flask_sugar.exceptions import RequestValidationError
 from flask_sugar.openapi import openapi_json_view, redoc, swagger
-from flask_sugar.typing import MethodTyping
+from flask_sugar.typing import DocRouteFilter, MethodTyping
 from flask_sugar.utils import convert_path
 from flask_sugar.view import View
 
@@ -37,6 +38,8 @@ class Sugar(MethodTyping, Flask):
         servers: Optional[List[Dict[str, Union[str, Any]]]] = None,
         tags: Optional[List[Dict[str, Any]]] = None,
         security_schemes: Optional[Dict[str, Any]] = None,
+        enable_doc: bool = True,
+        cache_openapi_json: bool = True,
         openapi_url_prefix: Optional[str] = None,
         openapi_json_url: str = "/openapi.json",
         swagger_url: str = "/doc",
@@ -45,6 +48,7 @@ class Sugar(MethodTyping, Flask):
         swagger_css_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
         redoc_js_url: str = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
         default_validation_errorhandler: Optional[Callable[..., Any]] = None,
+        doc_route_filter: Optional[DocRouteFilter] = None,
     ):
         super().__init__(
             import_name=import_name,
@@ -67,6 +71,7 @@ class Sugar(MethodTyping, Flask):
         self.servers = servers
         self.tags = tags
         self.security_schemes = security_schemes
+        self.cache_openapi_json = cache_openapi_json
         self.openapi_url_prefix = openapi_url_prefix
         self.openapi_json_url = openapi_json_url
         self.swagger_url = swagger_url
@@ -75,14 +80,15 @@ class Sugar(MethodTyping, Flask):
         self.swagger_js_url = swagger_js_url
         self.swagger_css_url = swagger_css_url
         self.redoc_js_url = redoc_js_url
+        self.doc_route_filter = doc_route_filter
         error_handler = (
             default_validation_errorhandler
             if default_validation_errorhandler is not None
             else validation_error_handler
         )
         self.register_error_handler(RequestValidationError, error_handler)
-
-        self.init_doc()
+        if enable_doc:
+            self.init_doc()
 
     def add_url_rule(
         self,
@@ -139,8 +145,13 @@ class Sugar(MethodTyping, Flask):
     def init_doc(self):
         openapi_bp = Blueprint("openapi", __name__, url_prefix=self.openapi_url_prefix)
         if self.openapi_json_url:
+            _openapi_json_view = (
+                lru_cache(maxsize=1)(openapi_json_view)
+                if self.cache_openapi_json
+                else openapi_json_view
+            )
             openapi_bp.add_url_rule(
-                self.openapi_json_url, view_func=openapi_json_view, doc_enable=False
+                self.openapi_json_url, view_func=_openapi_json_view, doc_enable=False
             )
 
         if self.openapi_json_url and self.swagger_url:

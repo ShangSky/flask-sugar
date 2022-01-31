@@ -33,6 +33,9 @@
 | `license_` | `dict` | 公开 API 的许可证书信息，它可以包含多个字段。<details><summary><code>license_</code> 字段</summary><table><thead><tr><th>参数</th><th>类型</th><th>描述</th></tr></thead><tbody><tr><td><code>name</code></td><td><code>str</code></td><td><strong>必须的</strong> (如果设置了<code>license_</code>). 用于 API 的许可证的名称。</td></tr><tr><td><code>url</code></td><td><code>str</code></td><td>用于 API 的许可证的 URL。 必须采用 URL 格式。</td></tr></tbody></table></details> |
 | `servers` | `list` | 一组服务器对象，提供与目标服务器的连接信息。 如果未提供服务器属性，或者提供一个空数组，则默认值将是一个 url 值为 / 的服务器对象。 |
 | `security_schemes` | `dict` | 定义操作可以使用的安全方案。 支持的方案是 HTTP 身份验证、API 密钥（作为标头、cookie 参数或作为查询参数）、OAuth2 的常见流程（隐式、密码、客户端凭据和授权代码），如 RFC6749 和 OpenID Connect Discovery 中所定义。<details><summary><code>security_schemes</code> 字段</summary><table><thead><tr><th>参数</th><th>类型</th><th>描述</th></tr></thead><tbody><tr><td><code>type</code></td><td><code>str</code></td><td>必须的. 安全方案的类型。 有效值为“apiKey”、“http”、“oauth2”、“openIdConnect”。</td></tr><tr><td><code>description</code></td><td><code>str</code></td><td>安全方案的简短描述。 CommonMark 语法可以用于富文本表示。</td></tr><tr><td><code>name</code></td><td><code>str</code></td><td>	必须的. 要使用的标头、查询或 cookie 参数的名称。</td></tr><tr><td><code>in</code></td><td><code>str</code></td><td>	必须的. API 密钥的位置。 有效值为“查询”、“标题”或“cookie”。</td></tr><tr></tr><tr><td><code>等等</code></td></tr></tbody></table></details>|
+| `enable_doc` | `bool` | 是否启用api文档, 默认 `True` |
+| `cache_openapi_json` | `bool` | 是否缓存 OpenAPI json, 默认 `True` |
+| `doc_route_filter` | `DocRouteFilter` | API文档路由过滤器 | |
 
 !!! Tip
     更多的信息在[swagger文档](https://swagger.io/specification/)

@@ -207,6 +207,10 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
             method: str = method.lower()
             if method not in ALLOW_METHODS:
                 continue
+            if current_app.doc_route_filter and not current_app.doc_route_filter(
+                view, rule
+            ):
+                continue
             parameters = get_parameters(view.ParamModel, view.parameter_infos)
             if parameters:
                 operation["parameters"] = parameters
