@@ -314,3 +314,7 @@ class View:
 
     def __repr__(self):
         return f"View(view_func={self.view_func}, doc_enable={self.doc_enable})"
+
+    def __eq__(self, other: Any) -> bool:
+        other_view_func = getattr(other, "view_func", None)
+        return self.view_func == other_view_func
