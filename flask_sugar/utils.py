@@ -5,7 +5,13 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
 from pydantic.typing import ForwardRef, evaluate_forwardref
 
 from flask_sugar import params
-from flask_sugar.typing import get_origin
+
+try:
+    from typing import get_origin  # type: ignore
+except ImportError:  # pragma: no coverage
+
+    def get_origin(tp: Any) -> Optional[Any]:
+        return getattr(tp, "__origin__", None)
 
 
 def is_typed_dict(cls: Any) -> bool:

@@ -67,6 +67,7 @@ class View:
         self,
         path: str,
         view_func: Callable,
+        endpoint: Optional[str] = None,
         doc_enable: bool = True,
         tags: Optional[List[str]] = None,
         summary: Optional[str] = None,
@@ -188,7 +189,8 @@ class View:
             )
         if field_definitions:
             self.ParamModel = create_model(
-                get_long_obj_name(view_func, "ParamModel"), **field_definitions
+                get_long_obj_name(view_func, f"{endpoint or ''}__ParamModel"),
+                **field_definitions,
             )
 
         if self.file_infos:

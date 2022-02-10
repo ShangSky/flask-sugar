@@ -48,7 +48,7 @@ def demo2():
 
 ### 蓝图标签
 
-您可以使用 `tags` 参数将标签应用于蓝图声明的所有视图函数：
+您可以使用 `tags` 参数将标签应用于蓝图声明的所有视图函数，路由继承所属蓝图的标签，您可以设置 `extends_tags=False` 禁用它：
 
 ```Python
 from flask_sugar import Sugar, Blueprint
@@ -63,7 +63,7 @@ def demo1():
     return {"code": 0}
 
 
-@hello_bp.get("/demo2")
+@hello_bp.get("/demo2", extends_tags=False)
 def demo2():
     return {"code": 0}
 

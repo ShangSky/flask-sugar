@@ -47,7 +47,7 @@ Tagged operations may be handled differently by various tools and libraries. For
 
 ### Blueprint tags
 
-You can use `tags` argument to apply tags to all operations declared by Blueprint:
+You can use `tags` argument to apply tags to all operations declared by Blueprint, Routes inherit the Blueprint's tags, you can set `extends_tags=False` to disable it:
 
 ```Python
 from flask_sugar import Sugar, Blueprint
@@ -62,7 +62,7 @@ def demo1():
     return {"code": 0}
 
 
-@hello_bp.get("/demo2")
+@hello_bp.get("/demo2", extends_tags=False)
 def demo2():
     return {"code": 0}
 
