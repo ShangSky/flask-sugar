@@ -202,15 +202,18 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
         if not getattr(view, "doc_enable"):
             continue
         path_item = {}
+
+        if current_app.doc_route_filter and not current_app.doc_route_filter(
+                view, rule
+        ):
+            continue
+
         for method in rule.methods:
             operation = {}
             method: str = method.lower()
             if method not in ALLOW_METHODS:
                 continue
-            if current_app.doc_route_filter and not current_app.doc_route_filter(
-                view, rule
-            ):
-                continue
+
             parameters = get_parameters(view.ParamModel, view.parameter_infos)
             if parameters:
                 operation["parameters"] = parameters
