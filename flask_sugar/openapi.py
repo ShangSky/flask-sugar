@@ -204,7 +204,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
         path_item = {}
 
         if current_app.doc_route_filter and not current_app.doc_route_filter(
-                view, rule
+            view, rule
         ):
             continue
 

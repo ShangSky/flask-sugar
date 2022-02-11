@@ -1,2 +1,2 @@
-def validation_error_handler(e):
-    return {"detail": e.errors}
+def validation_error_handler(error):
+    return {"detail": error.errors}
