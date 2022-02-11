@@ -263,7 +263,7 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 )
 
             responses: Dict[Union[int, str], Dict[str, Any]] = {
-                "200": {
+                view.status_code or "200": {
                     "description": view.response_description,
                     "content": {"application/json": {"schema": response_schema}},
                 }

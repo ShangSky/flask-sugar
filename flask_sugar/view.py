@@ -74,6 +74,7 @@ class View:
         description: Optional[str] = None,
         response_description: str = "success",
         response_model: Optional[Type[BaseModel]] = None,
+        status_code: Optional[int] = None,
         responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
         deprecated: Optional[bool] = None,
         operation_id: Optional[str] = None,
@@ -96,6 +97,7 @@ class View:
         self.description = description
         self.response_description = response_description
         self.response_model = response_model
+        self.status_code = status_code
         self.responses = responses
         self.deprecated = deprecated
         self.operation_id = operation_id
@@ -312,7 +314,12 @@ class View:
         if errors:
             raise RequestValidationError(errors)
         response = self.view_func(**cleaned_data)
-        return self.create_response(response)
+        rv = self.create_response(response)
+
+        if isinstance(rv, (str, dict, )) and self.status_code:
+            rv = rv, self.status_code
+
+        return rv
 
     def __repr__(self):
         return f"View(view_func={self.view_func}, doc_enable={self.doc_enable})"
