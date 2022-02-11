@@ -80,6 +80,21 @@ def get_nums(greater_than: int, offset: int = 10):
 
 In this case, Flask Sugar will always validate that you pass the `greater_than` param in the GET, and the `offset` param is an optional integer.
 
+## More validation by pydantic
+
+```python
+from flask_sugar import Sugar, Query
+
+app = Sugar(__name__)
+
+
+@app.get("/nums")
+def get_nums(limit: Optional[int] = Query(default=10, le=25), offset: Optional[int] = Query(default=0)):
+    return nums[offset: offset + limit]
+```
+
+In the example above we set default values of `offset=0` and `limit=10`, and Flask Sugar will always validate the `limit` must be less than or equal to 25. 
+
 ### GET parameters type conversion
 
 Let's declare multiple type arguments:

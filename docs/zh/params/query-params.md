@@ -80,6 +80,22 @@ def get_nums(greater_than: int, offset: int = 10):
 
 在这种情况下，Flask Sugar 将始终验证您在 GET 中传递的`greater_than`参数，并且`offset`参数是一个可选整数.
 
+## 校验更多参数(使用pydantic)
+
+```python
+from flask_sugar import Sugar, Query
+
+app = Sugar(__name__)
+
+
+@app.get("/nums")
+def get_nums(limit: Optional[int] = Query(default=10, le=25), offset: Optional[int] = Query(default=0)):
+    return nums[offset: offset + limit]
+```
+
+在上面的例子中，我们设置了默认值 offset=0 和 limit=10,  limit的值必须小于或者等于25
+
+
 ### GET参数类型转换
 
 我们来定义多个参数:
