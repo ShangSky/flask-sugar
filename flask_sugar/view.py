@@ -314,7 +314,12 @@ class View:
         if errors:
             raise RequestValidationError(errors)
         response = self.view_func(**cleaned_data)
-        return self.create_response(response)
+        rv = self.create_response(response)
+
+        if isinstance(rv, (str, dict, )) and self.status_code:
+            rv = rv, self.status_code
+
+        return rv
 
     def __repr__(self):
         return f"View(view_func={self.view_func}, doc_enable={self.doc_enable})"
