@@ -14,7 +14,7 @@ from typing import (
     Union,
 )
 
-from flask import request
+from flask import make_response, request
 from flask.typing import ResponseReturnValue
 from pydantic import (
     BaseModel,
@@ -315,11 +315,10 @@ class View:
             raise RequestValidationError(errors)
         response = self.view_func(**cleaned_data)
         rv = self.create_response(response)
-
-        if isinstance(rv, (str, dict, )) and self.status_code:
-            rv = rv, self.status_code
-
-        return rv
+        resp = make_response(rv)
+        if self.status_code:
+            resp.status_code = self.status_code
+        return resp
 
     def __repr__(self):
         return f"View(view_func={self.view_func}, doc_enable={self.doc_enable})"
