@@ -1,7 +1,8 @@
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Type, Union
-
+from packaging.version import parse
 from flask import Flask
+from flask import __version__ as flask_version  # type: ignore
 from pydantic import BaseModel
 from werkzeug.routing import Rule
 
@@ -197,6 +198,30 @@ class Sugar(Flask):
         response_model_exclude_none: bool = False,
         **options: Any,
     ) -> Callable:
+        if parse(flask_version) < parse("2.0.0"):
+            return self._do_decorator("GET",
+                                      rule,
+                                      provide_automatic_options=provide_automatic_options,
+                                      doc_enable=doc_enable,
+                                      tags=tags,
+                                      summary=summary,
+                                      description=description,
+                                      response_model=response_model,
+                                      status_code=status_code,
+                                      response_description=response_description,
+                                      responses=responses,
+                                      deprecated=deprecated,
+                                      operation_id=operation_id,
+                                      security=security,
+                                      extra=extra,
+                                      response_model_include=response_model_include,
+                                      response_model_exclude=response_model_exclude,
+                                      response_model_by_alias=response_model_by_alias,
+                                      response_model_exclude_unset=response_model_exclude_unset,
+                                      response_model_exclude_defaults=response_model_exclude_defaults,
+                                      response_model_exclude_none=response_model_exclude_none,
+                                      **options)
+
         return super().get(
             rule=rule,
             endpoint=endpoint,
@@ -247,6 +272,30 @@ class Sugar(Flask):
         response_model_exclude_none: bool = False,
         **options: Any,
     ) -> Callable:
+        if parse(flask_version) < parse("2.0.0"):
+            return self._do_decorator("POST",
+                                      rule,
+                                      provide_automatic_options=provide_automatic_options,
+                                      doc_enable=doc_enable,
+                                      tags=tags,
+                                      summary=summary,
+                                      description=description,
+                                      response_model=response_model,
+                                      status_code=status_code,
+                                      response_description=response_description,
+                                      responses=responses,
+                                      deprecated=deprecated,
+                                      operation_id=operation_id,
+                                      security=security,
+                                      extra=extra,
+                                      response_model_include=response_model_include,
+                                      response_model_exclude=response_model_exclude,
+                                      response_model_by_alias=response_model_by_alias,
+                                      response_model_exclude_unset=response_model_exclude_unset,
+                                      response_model_exclude_defaults=response_model_exclude_defaults,
+                                      response_model_exclude_none=response_model_exclude_none,
+                                      **options)
+
         return super().post(
             rule=rule,
             endpoint=endpoint,
@@ -297,6 +346,30 @@ class Sugar(Flask):
         response_model_exclude_none: bool = False,
         **options: Any,
     ) -> Callable:
+        if parse(flask_version) < parse("2.0.0"):
+            return self._do_decorator("PUT",
+                                      rule,
+                                      provide_automatic_options=provide_automatic_options,
+                                      doc_enable=doc_enable,
+                                      tags=tags,
+                                      summary=summary,
+                                      description=description,
+                                      response_model=response_model,
+                                      status_code=status_code,
+                                      response_description=response_description,
+                                      responses=responses,
+                                      deprecated=deprecated,
+                                      operation_id=operation_id,
+                                      security=security,
+                                      extra=extra,
+                                      response_model_include=response_model_include,
+                                      response_model_exclude=response_model_exclude,
+                                      response_model_by_alias=response_model_by_alias,
+                                      response_model_exclude_unset=response_model_exclude_unset,
+                                      response_model_exclude_defaults=response_model_exclude_defaults,
+                                      response_model_exclude_none=response_model_exclude_none,
+                                      **options)
+
         return super().put(
             rule=rule,
             endpoint=endpoint,
@@ -347,6 +420,30 @@ class Sugar(Flask):
         response_model_exclude_none: bool = False,
         **options: Any,
     ) -> Callable:
+        if parse(flask_version) < parse("2.0.0"):
+            return self._do_decorator("DELETE",
+                                      rule,
+                                      provide_automatic_options=provide_automatic_options,
+                                      doc_enable=doc_enable,
+                                      tags=tags,
+                                      summary=summary,
+                                      description=description,
+                                      response_model=response_model,
+                                      status_code=status_code,
+                                      response_description=response_description,
+                                      responses=responses,
+                                      deprecated=deprecated,
+                                      operation_id=operation_id,
+                                      security=security,
+                                      extra=extra,
+                                      response_model_include=response_model_include,
+                                      response_model_exclude=response_model_exclude,
+                                      response_model_by_alias=response_model_by_alias,
+                                      response_model_exclude_unset=response_model_exclude_unset,
+                                      response_model_exclude_defaults=response_model_exclude_defaults,
+                                      response_model_exclude_none=response_model_exclude_none,
+                                      **options)
+
         return super().delete(
             rule=rule,
             endpoint=endpoint,
@@ -397,6 +494,30 @@ class Sugar(Flask):
         response_model_exclude_none: bool = False,
         **options: Any,
     ) -> Callable:
+        if parse(flask_version) < parse("2.0.0"):
+            return self._do_decorator("PATCH",
+                                      rule,
+                                      provide_automatic_options=provide_automatic_options,
+                                      doc_enable=doc_enable,
+                                      tags=tags,
+                                      summary=summary,
+                                      description=description,
+                                      response_model=response_model,
+                                      status_code=status_code,
+                                      response_description=response_description,
+                                      responses=responses,
+                                      deprecated=deprecated,
+                                      operation_id=operation_id,
+                                      security=security,
+                                      extra=extra,
+                                      response_model_include=response_model_include,
+                                      response_model_exclude=response_model_exclude,
+                                      response_model_by_alias=response_model_by_alias,
+                                      response_model_exclude_unset=response_model_exclude_unset,
+                                      response_model_exclude_defaults=response_model_exclude_defaults,
+                                      response_model_exclude_none=response_model_exclude_none,
+                                      **options)
+
         return super().patch(
             rule=rule,
             endpoint=endpoint,
@@ -421,3 +542,59 @@ class Sugar(Flask):
             response_model_exclude_none=response_model_exclude_none,
             **options,
         )
+
+    def _do_decorator(self,
+                      method: str,
+                      rule: str,
+                      provide_automatic_options: Optional[bool] = None,
+                      doc_enable: bool = True,
+                      tags: Optional[List[str]] = None,
+                      summary: Optional[str] = None,
+                      description: Optional[str] = None,
+                      response_model: Optional[Type[BaseModel]] = None,
+                      status_code: Optional[int] = None,
+                      response_description: str = "success",
+                      responses: Optional[Dict[Union[int, str], Dict[str, Any]]] = None,
+                      deprecated: Optional[bool] = None,
+                      operation_id: Optional[str] = None,
+                      security: Optional[List[Dict[str, Any]]] = None,
+                      extra: Optional[Dict[str, Any]] = None,
+                      response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+                      response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+                      response_model_by_alias: bool = True,
+                      response_model_exclude_unset: bool = False,
+                      response_model_exclude_defaults: bool = False,
+                      response_model_exclude_none: bool = False,
+                      **options: Any):
+
+        def decorator(view_func: Callable) -> Callable:
+            endpoint = options.pop("endpoint", None)
+            options.update({"methods": [method]})
+            self.add_url_rule(
+                rule,
+                endpoint,
+                view_func,
+                provide_automatic_options=provide_automatic_options,
+                doc_enable=doc_enable,
+                tags=tags,
+                summary=summary,
+                description=description,
+                response_model=response_model,
+                status_code=status_code,
+                response_description=response_description,
+                responses=responses,
+                deprecated=deprecated,
+                operation_id=operation_id,
+                security=security,
+                extra=extra,
+                response_model_include=response_model_include,
+                response_model_exclude=response_model_exclude,
+                response_model_by_alias=response_model_by_alias,
+                response_model_exclude_unset=response_model_exclude_unset,
+                response_model_exclude_defaults=response_model_exclude_defaults,
+                response_model_exclude_none=response_model_exclude_none,
+                **options
+            )
+            return view_func
+
+        return decorator

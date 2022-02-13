@@ -11,7 +11,7 @@ Source Code: <https://github.com/shangsky/flask-sugar>
 ## Requirements
 
 - Python 3.6+
-- Flask 2.0+
+- Flask
 
 ## Installation
 

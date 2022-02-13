@@ -38,5 +38,5 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Topic :: Software Development :: Libraries",
     ],
-    install_requires=["flask>=2.0", "pydantic>=1.8,<2.0.0"],
+    install_requires=["flask", "packaging", "pydantic>=1.8,<2.0.0"],
 )

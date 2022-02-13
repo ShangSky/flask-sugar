@@ -1,4 +1,5 @@
-flask>=2.0
+flask
+packaging
 pydantic>=1.8,<2.0.0
 pyright
 black

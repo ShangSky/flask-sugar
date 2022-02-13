@@ -12,7 +12,7 @@ Flask Sugar是一个基于flask, pyddantic和类型注解的API框架.
 ## 依赖
 
 - Python 3.6+
-- Flask 2.0+
+- Flask
 
 ## 安装
 
