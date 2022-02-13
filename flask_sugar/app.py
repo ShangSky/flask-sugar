@@ -8,7 +8,7 @@ from werkzeug.routing import Rule
 from flask_sugar.blueprints import Blueprint
 from flask_sugar.errorhandlers import validation_error_handler
 from flask_sugar.exceptions import RequestValidationError
-from flask_sugar.openapi import openapi_json_view, redoc, swagger
+from flask_sugar.openapi import openapi_json_view, redoc, swagger, rapidoc
 from flask_sugar.utils import convert_path
 from flask_sugar.view import View
 
@@ -44,9 +44,11 @@ class Sugar(Flask):
         openapi_json_url: str = "/openapi.json",
         swagger_url: str = "/doc",
         redoc_url: str = "/redoc",
+        rapidoc_url: str = "/rapidoc",
         swagger_js_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js",
         swagger_css_url: str = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css",
         redoc_js_url: str = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js",
+        rapidoc_js_url: str = "https://cdn.jsdelivr.net/npm/rapidoc@9.1.4/dist/rapidoc-min.min.js",
         default_validation_errorhandler: Optional[Callable[..., Any]] = None,
         doc_route_filter: Optional[Callable[[View, Rule], bool]] = None,
     ):
@@ -76,10 +78,12 @@ class Sugar(Flask):
         self.openapi_json_url = openapi_json_url
         self.swagger_url = swagger_url
         self.redoc_url = redoc_url
+        self.rapidoc_url = rapidoc_url
         self.openapi_version = "3.0.2"
         self.swagger_js_url = swagger_js_url
         self.swagger_css_url = swagger_css_url
         self.redoc_js_url = redoc_js_url
+        self.rapidoc_js_url = rapidoc_js_url
         self.doc_route_filter = doc_route_filter
         error_handler = (
             default_validation_errorhandler
@@ -164,6 +168,9 @@ class Sugar(Flask):
 
         if self.openapi_json_url and self.redoc_url:
             openapi_bp.add_url_rule(self.redoc_url, view_func=redoc, doc_enable=False)
+
+        if self.openapi_json_url and self.rapidoc_url:
+            openapi_bp.add_url_rule(self.rapidoc_url, view_func=rapidoc, doc_enable=False)
 
         self.register_blueprint(openapi_bp)
 

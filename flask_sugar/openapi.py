@@ -27,7 +27,7 @@ from pydantic.schema import (
 )
 
 from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX, REF_TEMPLATE
-from flask_sugar.templates import redoc_template, swagger_template
+from flask_sugar.templates import redoc_template, swagger_template, rapidoc_template
 from flask_sugar.view import ParameterInfo, View
 
 if TYPE_CHECKING:
@@ -107,6 +107,15 @@ def redoc() -> str:
         openapi_json_url=current_app.openapi_json_url,
         title=current_app.title + " Redoc",
         redoc_js_url=current_app.redoc_js_url,
+    )
+
+
+def rapidoc() -> str:
+    return render_template_string(
+        rapidoc_template,
+        openapi_json_url=current_app.openapi_json_url,
+        title=current_app.title + " Rapidoc",
+        rapidoc_js_url=current_app.rapidoc_js_url,
     )
 
 

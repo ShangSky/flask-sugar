@@ -59,3 +59,23 @@ redoc_template: str = """
 
 </html>
 """
+rapidoc_template: str = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=yes">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<rapi-doc spec-url="{{ url_for('openapi.openapi_json_view') }}"></rapi-doc>
+<script src="{{ rapidoc_js_url }}"></script>
+</body>
+</html>
+"""
