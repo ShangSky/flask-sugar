@@ -16,12 +16,7 @@ from typing import (
 
 from flask import make_response, request
 from flask.typing import ResponseReturnValue
-from pydantic import (
-    BaseModel,
-    ValidationError,
-    create_model,
-    create_model_from_typeddict,
-)
+from pydantic import BaseModel, ValidationError, create_model, create_model_from_typeddict
 from pydantic.fields import FieldInfo, ModelField
 from typing_extensions import Literal
 from werkzeug.datastructures import ImmutableMultiDict
@@ -134,9 +129,7 @@ class View:
                 continue
             annotation = get_param_annotation(param)
             if is_subclass(annotation, BaseModel):
-                assert (
-                    self.body_info is None
-                ), "a view_func require only one BaseModel field"
+                assert self.body_info is None, "a view_func require only one BaseModel field"
                 if param.default == param.empty:
                     parameter = params.Body(...)
                 else:
@@ -245,9 +238,7 @@ class View:
             model_field = model_fields[parameter.name]
             in_ = parameter.parameter.in_
             alias = model_field.alias
-            value = self.get_value(
-                in_, alias, parameter.name, parameter.is_list, kwargs
-            )
+            value = self.get_value(in_, alias, parameter.name, parameter.is_list, kwargs)
             if value is not None:
                 if result_use_alias:
                     values[alias] = value
@@ -255,14 +246,10 @@ class View:
                     values[parameter.name] = value
         return values
 
-    def inject_data(
-        self, kwargs: Dict[str, Any]
-    ) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+    def inject_data(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
         errors: List[Dict[str, Any]] = []
         if self.ParamModel:
-            request_values = self.get_request_values(
-                self.parameter_infos, self.ParamModel, kwargs
-            )
+            request_values = self.get_request_values(self.parameter_infos, self.ParamModel, kwargs)
             try:
                 param_data = self.ParamModel(**request_values)
                 kwargs.update(param_data.dict())
@@ -279,9 +266,7 @@ class View:
                 errors.extend(e.errors())
 
         if self.FileModel:
-            files = self.get_request_values(
-                self.file_infos, self.FileModel, kwargs, False
-            )
+            files = self.get_request_values(self.file_infos, self.FileModel, kwargs, False)
 
             try:
                 file_model = self.FileModel(**files)

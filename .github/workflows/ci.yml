@@ -1,11 +1,30 @@
 name: ci
-on:
-  push:
-    branches:
-      - master
-      - main
+on: [push]
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install pyright
+      - run: pyright flask_sugar
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install black isort
+      - name: isort
+        run: isort flask_sugar --check
+      - name: black
+        run: black -v flask_sugar --check
   deploy:
+    if: github.repository == 'main'
+    needs: [lint, format]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

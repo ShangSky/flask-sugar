@@ -27,7 +27,7 @@ from pydantic.schema import (
 )
 
 from flask_sugar.constans import ALLOW_METHODS, REF_PREFIX, REF_TEMPLATE
-from flask_sugar.templates import redoc_template, swagger_template, rapidoc_template
+from flask_sugar.templates import rapidoc_template, redoc_template, swagger_template
 from flask_sugar.view import ParameterInfo, View
 
 if TYPE_CHECKING:
@@ -203,18 +203,16 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
     components = {}
     flat_models = get_flat_models_from_views(current_app.view_functions.values())
     model_name_map = get_model_name_map(flat_models)
-    schemas = schema(
-        flat_models, model_name_map=model_name_map, ref_prefix=REF_PREFIX
-    ).get("definitions", {})
+    schemas = schema(flat_models, model_name_map=model_name_map, ref_prefix=REF_PREFIX).get(
+        "definitions", {}
+    )
     for rule in current_app.url_map.iter_rules():
         view: View = cast(View, current_app.view_functions[rule.endpoint])
         if not getattr(view, "doc_enable"):
             continue
         path_item = {}
 
-        if current_app.doc_route_filter and not current_app.doc_route_filter(
-            view, rule
-        ):
+        if current_app.doc_route_filter and not current_app.doc_route_filter(view, rule):
             continue
 
         for method in rule.methods:
@@ -260,16 +258,12 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
                     media_type = view.body_info.parameter.media_type  # type:ignore
 
                 operation["requestBody"] = {
-                    "content": {
-                        media_type: {"schema": {"$ref": REF_PREFIX + body_model_name}}
-                    },
+                    "content": {media_type: {"schema": {"$ref": REF_PREFIX + body_model_name}}},
                     "required": True,
                 }
             response_schema = {}
             if view.response_model:
-                response_schema["$ref"] = (
-                    REF_PREFIX + model_name_map[view.response_model]
-                )
+                response_schema["$ref"] = REF_PREFIX + model_name_map[view.response_model]
 
             responses: Dict[Union[int, str], Dict[str, Any]] = {
                 view.status_code

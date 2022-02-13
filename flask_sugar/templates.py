@@ -1,4 +1,4 @@
-swagger_template: str = """
+swagger_template: str = """\
 <!DOCTYPE html>
 <html>
 
@@ -30,7 +30,7 @@ swagger_template: str = """
 
 </html>
 """
-redoc_template: str = """
+redoc_template: str = """\
 <!DOCTYPE html>
 <html>
 
@@ -59,7 +59,7 @@ redoc_template: str = """
 
 </html>
 """
-rapidoc_template: str = """
+rapidoc_template: str = """\
 <!DOCTYPE html>
 <html lang="en">
 <head>

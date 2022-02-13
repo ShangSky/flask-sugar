@@ -8,7 +8,7 @@ from werkzeug.routing import Rule
 from flask_sugar.blueprints import Blueprint
 from flask_sugar.errorhandlers import validation_error_handler
 from flask_sugar.exceptions import RequestValidationError
-from flask_sugar.openapi import openapi_json_view, redoc, swagger, rapidoc
+from flask_sugar.openapi import openapi_json_view, rapidoc, redoc, swagger
 from flask_sugar.utils import convert_path
 from flask_sugar.view import View
 
@@ -162,9 +162,7 @@ class Sugar(Flask):
             )
 
         if self.openapi_json_url and self.swagger_url:
-            openapi_bp.add_url_rule(
-                self.swagger_url, view_func=swagger, doc_enable=False
-            )
+            openapi_bp.add_url_rule(self.swagger_url, view_func=swagger, doc_enable=False)
 
         if self.openapi_json_url and self.redoc_url:
             openapi_bp.add_url_rule(self.redoc_url, view_func=redoc, doc_enable=False)
