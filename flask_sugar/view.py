@@ -247,7 +247,7 @@ class View:
         return values
 
     def inject_data(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
-        errors: List[Dict[str, Any]] = []
+        errors = []
         if self.ParamModel:
             request_values = self.get_request_values(self.parameter_infos, self.ParamModel, kwargs)
             try:
