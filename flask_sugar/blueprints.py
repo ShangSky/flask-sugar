@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Type, Union
 
 from flask import Blueprint as _Blueprint
+from flask.scaffold import _sentinel
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ class Blueprint(_Blueprint):
         subdomain: Optional[str] = None,
         url_defaults: Optional[dict] = None,
         root_path: Optional[str] = None,
-        cli_group: Optional[str] = None,
+        cli_group: Optional[str] = _sentinel,
         tags: Optional[List[str]] = None,
         deprecated: Optional[bool] = None,
     ):
