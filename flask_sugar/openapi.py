@@ -215,6 +215,9 @@ def collect_paths_components() -> Tuple[Dict[str, Any], Dict[str, Any]]:
         if current_app.doc_route_filter and not current_app.doc_route_filter(view, rule):
             continue
 
+        if rule.methods is None:
+            continue
+
         for method in rule.methods:
             operation = {}
             method: str = method.lower()

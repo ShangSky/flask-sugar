@@ -75,8 +75,8 @@ class View:
         operation_id: Optional[str] = None,
         security: Optional[List[Dict[str, Any]]] = None,
         extra: Optional[Dict[str, Any]] = None,
-        response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
+        response_model_include: Union["AbstractSetIntStr", "MappingIntStrAny", None] = None,
+        response_model_exclude: Union["AbstractSetIntStr", "MappingIntStrAny", None] = None,
         response_model_by_alias: bool = True,
         response_model_exclude_unset: bool = False,
         response_model_exclude_defaults: bool = False,
@@ -283,8 +283,8 @@ class View:
             return response.dict()
         if isinstance(response, dict) and self.response_model:
             return self.response_model(**response).dict(
-                include=self.response_model_include,
-                exclude=self.response_model_exclude,
+                include=self.response_model_include,  # type:ignore
+                exclude=self.response_model_exclude,  # type:ignore
                 by_alias=self.response_model_by_alias,
                 exclude_unset=self.response_model_exclude_unset,
                 exclude_defaults=self.response_model_exclude_defaults,
