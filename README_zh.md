@@ -6,7 +6,7 @@ Flask Sugar是一个基于flask, pyddantic和类型注解的API框架.
 
 可以检查参数并自动生成API文档
 
-文档: <https://shangsky.github.io/flask-sugar>
+文档: <https://shangsky.github.io/flask-sugar> 或 <https://flask-sugar.vercel.app/>
 
 源码: <https://github.com/shangsky/flask-sugar>
 

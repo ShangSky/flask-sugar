@@ -6,7 +6,7 @@ Flask Sugar is a web framework for building APIs with Flask, Pydantic and Python
 
 check parameters and generate API documents automatically
 
-Documentation: <https://shangsky.github.io/flask-sugar>
+Documentation: <https://shangsky.github.io/flask-sugar> or <https://flask-sugar.vercel.app/>
 
 Source Code: <https://github.com/shangsky/flask-sugar>
 
